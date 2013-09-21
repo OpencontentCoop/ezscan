@@ -105,6 +105,7 @@ switch( $arguments[0] )
 
     // execute the script
     default:
+      return 1;
 }
 
 /**
