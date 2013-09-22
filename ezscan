@@ -274,25 +274,27 @@ if [ $ALL -eq 1 ] ; then
   fi
     echo 
     echo "eZ Publish directory:  $EZPCOMP_EZ_DIR"
-    echo
-    echo "#eZINI"
-    echo "[FileSettings]"
-    echo "VarDir=`$PHP_EZSCAN _ini FileSettings VarDir`" 
-    echo
-    echo "[DatabaseSettings]"
-    echo "DatabaseImplementation=`$PHP_EZSCAN _ini DatabaseSettings DatabaseImplementation`" 
-    echo "Server=`$PHP_EZSCAN _ini DatabaseSettings Server`" 
-    echo "Database=`$PHP_EZSCAN _ini DatabaseSettings Database`" 
-    echo "User=`$PHP_EZSCAN _ini DatabaseSettings User`" 
-    echo
-    echo "[SiteSettings]"
-    echo "SiteName=`$PHP_EZSCAN _ini SiteSettings SiteName`" 
-    echo "DefaultAccess=`$PHP_EZSCAN _ini SiteSettings DefaultAccess`" 
-    echo 
-    echo "[SiteAccessSettings]"
-    echo "AvailableSiteAccessList="
-    echo $siteaccess_list
-    echo
+    if [ -z $SITEACCESS ] ; then
+	    echo
+	    echo "#eZINI"
+	    echo "[FileSettings]"
+	    echo "VarDir=`$PHP_EZSCAN _ini FileSettings VarDir`" 
+	    echo
+	    echo "[DatabaseSettings]"
+	    echo "DatabaseImplementation=`$PHP_EZSCAN _ini DatabaseSettings DatabaseImplementation`" 
+	    echo "Server=`$PHP_EZSCAN _ini DatabaseSettings Server`" 
+	    echo "Database=`$PHP_EZSCAN _ini DatabaseSettings Database`" 
+	    echo "User=`$PHP_EZSCAN _ini DatabaseSettings User`" 
+	    echo
+	    echo "[SiteSettings]"
+	    echo "SiteName=`$PHP_EZSCAN _ini SiteSettings SiteName`" 
+	    echo "DefaultAccess=`$PHP_EZSCAN _ini SiteSettings DefaultAccess`" 
+	    echo 
+	    echo "[SiteAccessSettings]"
+	    echo "AvailableSiteAccessList="
+	    echo $siteaccess_list
+	    echo
+    fi
     # elavora gli ini di ogni siteaccess
     if [ $SITEACCESS ] ; then
     siteaccess_list=$SITEACCESS
