@@ -85,7 +85,6 @@ switch( $arguments[0] )
 		echo $var_Dir;
 		echo "\n";
 		break;
-
     // arguments list for a script
     case '_ini':
         if ( !isset( $arguments[1] ) )
@@ -98,7 +97,18 @@ switch( $arguments[0] )
         }
         echo "\n";
         break;
-
+    //
+    case '_ini_fetchFromFile':
+        if ( !isset( $arguments[1] ) )
+            return 2;
+        $output = eZINI::instance($fileName = "site.ini.append.php",$rootDir = "settings/siteaccess/$arguments[3]")->variable(  $arguments[1], $arguments[2] );
+        if  (is_array($output) ) {
+          complete( $output);
+        } else {
+          echo $output;
+        }
+        echo "\n";
+        break;
     // execute the script
     default:
       return 1;

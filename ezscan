@@ -30,9 +30,7 @@ PHP_EZSCAN=`which php_ezscan`
 #
 # getops see /usr/share/doc/util-linux/examples/getopt-parse.bash
 this_script=`basename $0`
-#TEMP=`getopt -o vhd:B:V:c:: --long verbose,help,directory:,ini-block-name:,ini-var-name:,c-long:: \
-#     -n "$this_script" -- "$@"`
-TEMP=`getopt -o vhB:V:az:: --long verbose,help,ini-block-name:,ini-var-name:,all,z-long:: \
+TEMP=`getopt -o vhB:V:as:z:: --long verbose,help,ini-block-name:,ini-var-name:,all,siteaccess:z-long:: \
      -n "$this_script" -- "$@"`
 
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
@@ -52,11 +50,13 @@ while true ; do
 				echo "              [-B|--ini-block-name block-name] [-V|--ini-var-name var-name]"
                 echo "              [-a|--all]"
                 echo "              [-h|--help]"
+                echo "              [-s|--siteaccess siteaccess]"
 				echo "              [DIRECTORY]"
 				echo "e.g."
 				echo "ezscan  /home/httpd/mysite.site.com/html"
                 echo "ezscan -a"
 				echo "ezscan -B DatabaseSettings -V User"
+                echo "ezscan -a -s SiteAccess"
 				echo "ezscan -h"
 				echo 
 				exit;;
@@ -84,6 +84,12 @@ while true ; do
               echo "Found the -a (--all) option"
             fi
             shift ;;
+        -s|--siteaccess)
+            SITEACCESS="$2"
+            if [ $VERBOSE -eq 1 ]; then
+              echo "Found the -s (--siteaccess) option, with value: $2"
+            fi
+            shift 2 ;;
         -z|--z-long)
             # c has an optional argument. As we are in quoted mode,
             # an empty parameter will be generated if its optional
@@ -240,6 +246,26 @@ if  [ "$EZINI_BLOCK_NAME" ] && [ "$EZINI_VAR_NAME" ] ; then
   exit
 fi
 
+#get siteaccess list
+siteaccess_list=`$PHP_EZSCAN _ini SiteAccessSettings AvailableSiteAccessList`
+
+# check if SITEACCESS exists
+if [ $SITEACCESS ] ; then
+	SITEACCESS_EXISTS="0"
+	for siteaccess in $siteaccess_list ; do
+	  if [ $siteaccess = $SITEACCESS ] ; then
+	    SITEACCESS_EXISTS="1"
+	  fi
+	done
+	if [ $SITEACCESS_EXISTS -eq 0 ] ; then 
+	  #echo "ERROR"
+	  echo "Siteaccess: '$SITEACCESS' does not exists"
+	  echo "Possible siteaccess are:"
+	  echo $siteaccess_list
+	  exit 1
+	fi
+fi
+
 
 #
 if [ $ALL -eq 1 ] ; then
@@ -259,9 +285,34 @@ if [ $ALL -eq 1 ] ; then
     echo "Database=`$PHP_EZSCAN _ini DatabaseSettings Database`" 
     echo "User=`$PHP_EZSCAN _ini DatabaseSettings User`" 
     echo
+    echo "[SiteSettings]"
+    echo "SiteName=`$PHP_EZSCAN _ini SiteSettings SiteName`" 
+    echo "DefaultAccess=`$PHP_EZSCAN _ini SiteSettings DefaultAccess`" 
+    echo 
     echo "[SiteAccessSettings]"
     echo "AvailableSiteAccessList="
-    echo "`$PHP_EZSCAN _ini SiteAccessSettings AvailableSiteAccessList`" 
+    echo $siteaccess_list
+    echo
+    # elavora gli ini di ogni siteaccess
+    if [ $SITEACCESS ] ; then
+    siteaccess_list=$SITEACCESS
+    fi
+    #
+    for siteaccess in $siteaccess_list 
+     do
+      echo 
+      echo "	siteaccess: $siteaccess"
+      echo "		[FileSettings]"
+      echo "		VarDir=`$PHP_EZSCAN _ini FileSettings VarDir`" 
+      echo
+      echo "		[DatabaseSettings]"
+      echo "		Server=`$PHP_EZSCAN _ini_fetchFromFile DatabaseSettings Server $siteaccess`" 
+      echo "		Database=`$PHP_EZSCAN _ini_fetchFromFile DatabaseSettings Database $siteaccess`" 
+      echo
+    done
+
+    echo
     echo
     echo "try 'ezscan --help' for datailed options"
+    echo
 fi
