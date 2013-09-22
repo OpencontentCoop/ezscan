@@ -21,83 +21,63 @@
 #
 VERBOSE=0
 #
-# getops see /usr/share/doc/util-linux/examples/getopt-parse.bash
-TEMP=`getopt -o vhd:B:V:c:: --long verbose,help,directory,ini-block-name,ini-var-name:,c-long:: \
-     -n 'ezscan' -- "$@"`
+# while getopts :vdsH:P:m:r:Q:t:u:o: opt
+while getopts vhd:B:V: opt
+do
+  case "$opt" in
+    v) echo "Found the -v (verbose) option"
+       VERBOSE=1 ;;
+    h) if [ $VERBOSE -eq 1 ]
+       then
+         echo "Found the -h (help) option"
+       fi
+       echo "Usage: "
+       echo "ezscan [-v] [OPTION] "
+       echo 
+       echo 
+       echo "Valid options are: "
+       echo
+       echo "   -d ez_directory   set ez directory (default to current directory)"
+       echo "   -B blockName      eZINI variable blockName you want to see"
+       echo "   -V varName        eZINI variable varName you want to see"
+       echo "   -v                verbose (better if it's the first option)"
+       echo "   -h                help (this page)"
+       echo " "
+       echo "Ex."
+       echo "ezscan -d /home/httpd/mysite.site.com/html"
+       echo "ezscan -B DatabaseSettings -V User"
+       echo "ezscan -h"
+       echo 
+       exit;;
+    d) EZ_DIR=$OPTARG
+       if [ $VERBOSE -eq 1 ]
+       then
+         echo "Found the -d (documentroot) option, with value: $OPTARG"
+       fi ;;
+    B) EZINI_BLOCK_NAME=$OPTARG
+       if [ $VERBOSE -eq 1 ]
+       then
+         echo "Found the -B (blockName) option, with value: $OPTARG"
+       fi ;;
+    V) EZINI_VAR_NAME=$OPTARG
+       if [ $VERBOSE -eq 1 ]
+       then
+         echo "Found the -V (varName) option, with value: $OPTARG"
+       fi ;;
 
-if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
-# Note the quotes around `$TEMP': they are essential!
-eval set -- "$TEMP"
-while true ; do
-    case "$1" in
-        -v|--verbose) echo "Found the -v (verbose) option"
-				VERBOSE=1 
-				shift ;;
-        -h|--help) 
-				if [ $VERBOSE -eq 1 ]
-				       then
-				         echo "Found the -h (help) option"
-				fi
-				echo "Usage: "
-				echo "ezscan [-v] [OPTION] "
-				echo 
-				echo "Valid options are: "
-				echo
-				echo "   -d ez_directory   set ez directory (default to current directory)"
-				echo "   -B blockName      eZINI variable blockName you want to see"
-				echo "   -V varName        eZINI variable varName you want to see"
-				echo "   -v                verbose (better if it's the first option)"
-				echo "   -h                help (this page)"
-				echo " "
-				echo "Ex."
-				echo "ezscan -d /home/httpd/mysite.site.com/html"
-				echo "ezscan -B DatabaseSettings -V User"
-				echo "ezscan -h"
-				echo 
-				exit;;
-        -d|--directory) 
-			EZ_DIR="$2" 
-            if [ $VERBOSE -eq 1 ]; then 
-              echo "Found the -d (documentroot) option, with value: $2"
-            fi 
-			shift 2 ;;
-        -B|--ini-block-name)
-            EZINI_BLOCK_NAME="$2"
-            if [ $VERBOSE -eq 1 ]; then
-              echo "Found the -B (--ini-block-name) option, with value: $2"
-            fi
-            shift 2 ;;
-        -V|--ini-var-name)
-            EZINI_VAR_NAME="$2"
-            if [ $VERBOSE -eq 1 ]; then
-              echo "Found the -V (--ini-var-name) option, with value: $2"
-            fi
-            shift 2 ;;
-        -c|--c-long)
-            # c has an optional argument. As we are in quoted mode,
-            # an empty parameter will be generated if its optional
-            # argument is not found.
-            case "$2" in
-                "") echo "Option c, no argument"; shift 2 ;;
-                *)  echo "Option c, argument \`$2'" ; shift 2 ;;
-            esac ;;
-        --) shift ; break ;;
-        *) echo "Internal error!" ; exit 1 ;;
-    esac
+    *) echo "Unknown option: $opt"
+       echo "Try 'ezscan -h' for more information."
+       exit 1 ;;
+  esac
 done
 
-
-
-if [ $VERBOSE -eq 1 ]
-then
-	echo "Remaining arguments:"
-	for arg do echo '--> '"\`$arg'" ; done
-fi
-
-#
-#echo "Unknown option: $1"
-#echo "Try 'ezscan -h' for more information."
-
+    if (optind < argc) {
+        printf ("non-option ARGV-elements: ");
+        while (optind < argc)
+            printf ("%s ", argv[optind++]);
+        printf ("\n");
+    }
+    exit (0);
 # Test presence of mandatory options
 #if [ -z "$EZ_DIR" ]
 #then
@@ -107,7 +87,7 @@ fi
 
 if ( [ "$EZINI_BLOCK_NAME" ] && [ -z "$EZINI_VAR_NAME" ] ) || ( [ -z "$EZINI_BLOCK_NAME" ] && [  "$EZINI_VAR_NAME" ] )
 then
-  echo "eZIni output needs both blockName & varName"
+  echo "eZIni output needs both blockName & varName must be present"
   EXIT_FOR_ERROR=yes
 fi
 
