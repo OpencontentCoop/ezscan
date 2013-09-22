@@ -16,14 +16,6 @@ $ezpCompDir = getenv( 'EZPCOMP_EZ_DIR' );
 $ezpCompIseZDir = getenv( 'EZPCOMP_IS_EZ_DIR' );
 $ezpCompPwd = getenv( 'EZPCOMP_PWD' );
 
-       echo "\n EZPCOMP_EZ_DIR: ";
-       echo getenv( 'EZPCOMP_EZ_DIR' );
-       echo "\n EZPCOMP_IS_EZ_DIR: ";
-       echo getenv( 'EZPCOMP_IS_EZ_DIR' );
-       echo "\n EZPCOMP_PWD:";
-       echo getenv( 'EZPCOMP_PWD' );
-       echo "\n";
-
 // switch the working directory based on what the completion shell script has
 if ( $ezpCompIseZDir == 1 && $ezpCompPwd != getcwd() )
 {
@@ -45,8 +37,8 @@ try {
 {
     die( $e->getMessage() );
 }
-$arguments = $input->getArguments();
 
+$arguments = $input->getArguments();
 if ( count( $arguments ) === 0 )
 {
        echo "ezscan: show ezpublish ini values\n";
@@ -65,13 +57,6 @@ if ( count( $arguments ) === 0 )
        echo "      ezscan _database_user\n";
        echo "\n";
        echo "Note: it must be executed inside an eZ documentroot (anywhere, but inside it)\n";
-       echo "\n";
-       echo "\n EZPCOMP_EZ_DIR: ";
-       echo getenv( 'EZPCOMP_EZ_DIR' );
-       echo "\n EZPCOMP_IS_EZ_DIR: ";
-       echo getenv( 'EZPCOMP_IS_EZ_DIR' );
-       echo "\n EZPCOMP_PWD";
-       echo getenv( 'EZPCOMP_PWD' );
        echo "\n";
        return;
 }
