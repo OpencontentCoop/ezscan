@@ -30,14 +30,10 @@ PHP_EZSCAN=`which php_ezscan`
 #
 # getops see /usr/share/doc/util-linux/examples/getopt-parse.bash
 this_script=`basename $0`
-TEMP=`getopt -o vhB:V:aS:sz:: --long verbose,help,ini-block-name:,ini-var-name:,all,siteaccess:,siteaccess-list,z-long:: \
+TEMP=`getopt -o vhB:V:as:: --long verbose,help,ini-block-name:,ini-var-name:,all,siteaccess:: \
      -n "$this_script" -- "$@"`
 
-if [ $? != 0 ] ; then 
-  echo "try 'ezscan --help' for datailed options"
-  echo "Terminating..." >&2 
-  exit 1 
-fi
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 # Note the quotes around `$TEMP': they are essential!
 eval set -- "$TEMP"
 while true ; do
@@ -54,15 +50,13 @@ while true ; do
 				echo "              [-B|--ini-block-name block-name] [-V|--ini-var-name var-name]"
                 echo "              [-a|--all]"
                 echo "              [-h|--help]"
-                echo "              [-s|--siteaccess-list]"
-                echo "              [-S|--siteaccess siteaccess]"
+                echo "              [-s|--siteaccess siteaccess]"
 				echo "              [DIRECTORY]"
 				echo "e.g."
 				echo "ezscan  /home/httpd/mysite.site.com/html"
                 echo "ezscan -a"
 				echo "ezscan -B DatabaseSettings -V User"
-                echo "ezscan -s"
-                echo "ezscan -a -S SiteAccess"
+                echo "ezscan -a -s SiteAccess"
 				echo "ezscan -h"
 				echo 
 				exit;;
@@ -90,19 +84,19 @@ while true ; do
               echo "Found the -a (--all) option"
             fi
             shift ;;
-        -S|--siteaccess)
-            SITEACCESS="$2"
-            if [ $VERBOSE -eq 1 ]; then
-              echo "Found the -S (--siteaccess) option, with value: $2"
-            fi
-            shift 2 ;;
-        -s|--siteaccess-list)
-            SITEACCESS_LIST="1"
-            if [ $VERBOSE -eq 1 ]; then
-              echo "Found the -s (--siteaccess-list) option"
-            fi
-            shift ;;
-
+        -s|--siteaccess)
+            # -s has optional argument
+            case "$2" in
+                "") echo "Option s, no argument"
+                    SITEACCESS_LIST="1"
+                    shift 2 ;;
+                *)  echo "Option s, argument \`$2'" 
+                    SITEACCESS="$2"
+                    if [ $VERBOSE -eq 1 ]; then
+                      echo "Found the -s (--siteaccess) option, with value: $2"
+                    fi
+                    shift 2 ;;
+                esac ;;
         -z|--z-long)
             # c has an optional argument. As we are in quoted mode,
             # an empty parameter will be generated if its optional
@@ -247,17 +241,6 @@ if [ $VERBOSE -eq 1 ] ; then
 fi
 cd $EZPCOMP_EZ_DIR
 
-#get siteaccess list
-siteaccess_list=`$PHP_EZSCAN _ini SiteAccessSettings AvailableSiteAccessList`
-
-if  [ "$SITEACCESS_LIST" ] ; then
-  if [ $VERBOSE -eq 1 ] ; then
-    echo  "# Executing: "
-    echo "$PHP_EZSCAN _ini SiteAccessSettings AvailableSiteAccessList" 
-  fi
-  echo $siteaccess_list
-  exit
-fi
 
 
 #/home/developer/scripts/ezscan_dev/ezscan-php.php $EZINI_BLOCK_NAME $EZINI_VAR_NAME
