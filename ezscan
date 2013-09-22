@@ -233,32 +233,6 @@ cd $EZPCOMP_EZ_DIR
 
 PHP_EZSCAN=`which php_ezscan`
 
-
-if [ $ALL -eq 1 ] ; then
-  if [ $VERBOSE -eq 1 ] ; then
-    echo  "# Showing all: "
-  fi
-    echo "eZ Publish directory=$EZ_DIR"
-    echo "#eZINI"
-    echo "[FileSettings]"
-    echo "VarDir=`$PHP_EZSCAN _ini FileSettings VarDir`" 
-    #
-    echo "[DatabaseSettings]"
-    echo "DatabaseImplementation=`$PHP_EZSCAN _ini DatabaseSettings DatabaseImplementation`" 
-    echo "[DatabaseSettings]"
-    echo "Server=`$PHP_EZSCAN _ini DatabaseSettings Server`" 
-    echo "[DatabaseSettings]"
-    echo "Database=`$PHP_EZSCAN _ini DatabaseSettings Database`" 
-    echo "[DatabaseSettings]"
-    echo "User=`$PHP_EZSCAN _ini DatabaseSettings User`" 
-    #
-    echo "[SiteAccessSettings]"
-    echo "AvailableSiteAccessList="
-    echo "`$PHP_EZSCAN _ini SiteAccessSettings AvailableSiteAccessList`" 
-
-fi
-
-
 #/home/developer/scripts/ezscan_dev/ezscan-php.php $EZINI_BLOCK_NAME $EZINI_VAR_NAME
 if  [ "$EZINI_BLOCK_NAME" ] && [ "$EZINI_VAR_NAME" ] ; then
   if [ $VERBOSE -eq 1 ] ; then
@@ -268,3 +242,31 @@ if  [ "$EZINI_BLOCK_NAME" ] && [ "$EZINI_VAR_NAME" ] ; then
   $PHP_EZSCAN  _ini $EZINI_BLOCK_NAME $EZINI_VAR_NAME
   exit
 fi
+
+
+# forse all for no options case
+ALL=1
+#
+if [ $ALL -eq 1 ] ; then
+  if [ $VERBOSE -eq 1 ] ; then
+    echo  "# Showing all: "
+  fi
+    echo 
+    echo "eZ Publish directory:  $EZ_DIR"
+    echo
+    echo "#eZINI"
+    echo "[FileSettings]"
+    echo "VarDir=`$PHP_EZSCAN _ini FileSettings VarDir`" 
+    echo
+    echo "[DatabaseSettings]"
+    echo "DatabaseImplementation=`$PHP_EZSCAN _ini DatabaseSettings DatabaseImplementation`" 
+    echo "Server=`$PHP_EZSCAN _ini DatabaseSettings Server`" 
+    echo "Database=`$PHP_EZSCAN _ini DatabaseSettings Database`" 
+    echo "User=`$PHP_EZSCAN _ini DatabaseSettings User`" 
+    echo
+    echo "[SiteAccessSettings]"
+    echo "AvailableSiteAccessList="
+    echo "`$PHP_EZSCAN _ini SiteAccessSettings AvailableSiteAccessList`" 
+    echo
+fi
+
