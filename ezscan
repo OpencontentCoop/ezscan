@@ -238,8 +238,24 @@ if [ $ALL -eq 1 ] ; then
   if [ $VERBOSE -eq 1 ] ; then
     echo  "# Showing all: "
   fi
-    echo "eZ Publish directory: $EZ_DIR"
-    echo "eZINI:: FileSettings Database: `$PHP_EZSCAN _ini FileSettings VarDir`" 
+    echo "eZ Publish directory=$EZ_DIR"
+    echo "#eZINI"
+    echo "[FileSettings]"
+    echo "VarDir=`$PHP_EZSCAN _ini FileSettings VarDir`" 
+    #
+    echo "[DatabaseSettings]"
+    echo "DatabaseImplementation=`$PHP_EZSCAN _ini DatabaseSettings DatabaseImplementation`" 
+    echo "[DatabaseSettings]"
+    echo "Server=`$PHP_EZSCAN _ini DatabaseSettings Server`" 
+    echo "[DatabaseSettings]"
+    echo "Database=`$PHP_EZSCAN _ini DatabaseSettings Database`" 
+    echo "[DatabaseSettings]"
+    echo "User=`$PHP_EZSCAN _ini DatabaseSettings User`" 
+    #
+    echo "[SiteAccessSettings]"
+    echo "AvailableSiteAccessList="
+    echo "`$PHP_EZSCAN _ini SiteAccessSettings AvailableSiteAccessList`" 
+
 fi
 
 
