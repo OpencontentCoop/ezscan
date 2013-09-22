@@ -3,7 +3,7 @@
 # ezscan script
 # v. 0.0.2
 #
-# getting info from ezpublish installations
+# return information about an ezpublish installation
 #
 #
 #* Return values:
@@ -25,7 +25,7 @@ VERBOSE=0
 this_script=`basename $0`
 #TEMP=`getopt -o vhd:B:V:c:: --long verbose,help,directory:,ini-block-name:,ini-var-name:,c-long:: \
 #     -n "$this_script" -- "$@"`
-TEMP=`getopt -o vhB:V:c:: --long verbose,help,ini-block-name:,ini-var-name:,c-long:: \
+TEMP=`getopt -o vhB:V:az:: --long verbose,help,ini-block-name:,ini-var-name:,all,z-long:: \
      -n "$this_script" -- "$@"`
 
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
@@ -41,14 +41,15 @@ while true ; do
 				       then
 				         echo "Found the -h (help) option"
 				fi
-				echo "usage: ezscan [-v|--verbose] [-d|directory]"
+				echo "usage: ezscan [-v|--verbose]"
 				echo "              [-B|--ini-block-name block-name] [-V|--ini-var-name var-name]"
-                echo "              [-B|--ini-block-name block-name] [-V|--ini-var-name var-name]"
+                echo "              [-a|--all]"
                 echo "              [-h|--help]"
-				echo "              DIRECTORY"
+				echo "              [DIRECTORY]"
 				echo "e.g."
 				echo "ezscan  /home/httpd/mysite.site.com/html"
-				echo "ezscan -B DatabaseSettings -V User     # default to current dir"
+                echo "ezscan -a"
+				echo "ezscan -B DatabaseSettings -V User"
 				echo "ezscan -h"
 				echo 
 				exit;;
@@ -70,13 +71,19 @@ while true ; do
               echo "Found the -V (--ini-var-name) option, with value: $2"
             fi
             shift 2 ;;
-        -c|--c-long)
+        -a|--all)
+            ALL="1"
+            if [ $VERBOSE -eq 1 ]; then
+              echo "Found the -a (--all) option"
+            fi
+            shift ;;
+        -z|--z-long)
             # c has an optional argument. As we are in quoted mode,
             # an empty parameter will be generated if its optional
             # argument is not found.
             case "$2" in
-                "") echo "Option c, no argument"; shift 2 ;;
-                *)  echo "Option c, argument \`$2'" ; shift 2 ;;
+                "") echo "Option z, no argument"; shift 2 ;;
+                *)  echo "Option z, argument \`$2'" ; shift 2 ;;
             esac ;;
         --) shift ; break ;;
         *) echo "Internal error!" ; exit 1 ;;
@@ -156,6 +163,10 @@ then
     EZ_DIR=`pwd`
 fi
 
+if [ -z "$ALL" ]
+then
+    ALL="0"
+fi
 
 
 if [ $VERBOSE -eq 1 ]
@@ -222,11 +233,22 @@ cd $EZPCOMP_EZ_DIR
 
 PHP_EZSCAN=`which php_ezscan`
 
+
+if [ $ALL -eq 1 ] ; then
+  if [ $VERBOSE -eq 1 ] ; then
+    echo  "# Showing all: "
+  fi
+    echo "eZ Publish directory: $EZ_DIR"
+    echo "eZINI:: FileSettings Database: `$PHP_EZSCAN _ini FileSettings VarDir`" 
+fi
+
+
 #/home/developer/scripts/ezscan_dev/ezscan-php.php $EZINI_BLOCK_NAME $EZINI_VAR_NAME
 if  [ "$EZINI_BLOCK_NAME" ] && [ "$EZINI_VAR_NAME" ] ; then
-  if [ $VERBOSE -eq 1 ] ; then 
+  if [ $VERBOSE -eq 1 ] ; then
     echo  "# Executing: "
     echo "$PHP_EZSCAN _ini $EZINI_BLOCK_NAME $EZINI_VAR_NAME" 
   fi
   $PHP_EZSCAN  _ini $EZINI_BLOCK_NAME $EZINI_VAR_NAME
+  exit
 fi
