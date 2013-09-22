@@ -2,26 +2,22 @@
 <?php
 /**
  *
+ * 
+ * Script creato da francesco su falsa riga di ezp per dare in pasto ad ezscan variabili eZ
+ *
+ *
  * Return values:
  * - 0: OK
  * - 1: unknown command
  * - 2: unknown script
+ * 
+ * 
  *
  * Arguments:
  * - 
  */
 
-// these environnement variables are set by the completion shell script
-$ezpCompDir = getenv( 'EZPCOMP_EZ_DIR' );
-$ezpCompIseZDir = getenv( 'EZPCOMP_IS_EZ_DIR' );
-$ezpCompPwd = getenv( 'EZPCOMP_PWD' );
-
-// switch the working directory based on what the completion shell script has
-if ( $ezpCompIseZDir == 1 && $ezpCompPwd != getcwd() )
-{
-    chdir( $ezpCompDir );
-}
-
+// check if we are on a ezpublish directory
 if ( !file_exists( "lib/version.php" ) )
 {
     echo "This script can only be executed from inside an eZ Publish directory\n";

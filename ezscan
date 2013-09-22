@@ -1,10 +1,12 @@
 #!/bin/bash
 #
 # ezscan script
-# v. 0.0.2
+# v. 0.0.3
 #
 # return information about an ezpublish installation
-#
+# 
+# NOTE: this script needs php_ezscan in user PATH
+#       (e.g. /usr/local/bin/php_ezscan)
 #
 #* Return values:
 # 0: OK
@@ -12,6 +14,9 @@
 #
 ###################################################################
 # 
+# v.0.3
+# aggiunto getops -l (long format)
+# aggiunto + options
 #
 # v.0.2
 # introdotto script bash
@@ -20,6 +25,8 @@
 #
 #
 VERBOSE=0
+PHP_EZSCAN=`which php_ezscan`
+#
 #
 # getops see /usr/share/doc/util-linux/examples/getopt-parse.bash
 this_script=`basename $0`
@@ -97,6 +104,7 @@ if [ $VERBOSE -eq 1 ] ; then
 	for arg do echo '--> '"\`$arg'" ; done
 fi
 
+# counting arguments
 count=0
 for arg do
   argomento="$arg"
@@ -124,21 +132,8 @@ if [ $count -ge 2 ] ; then
   
 fi
 
-#if [ -z  $arg ] ; then
-#	echo "try `basename $0` -h"
-#	exit 
-#fi
-
-#
-#echo "Unknown option: $1"
-#echo "Try 'ezscan -h' for more information."
 
 # Test presence of mandatory options
-#if [ -z "$EZ_DIR" ]
-#then
-#  echo "missing  -d (documentroot) option"
-#  EXIT_FOR_ERROR=yes
-#fi
 
 if ( [ "$EZINI_BLOCK_NAME" ] && [ -z "$EZINI_VAR_NAME" ] ) || ( [ -z "$EZINI_BLOCK_NAME" ] && [  "$EZINI_VAR_NAME" ] )
 then
@@ -158,14 +153,17 @@ fi
 #
 # set defaults
 
+# set EZ_DIR to current dir if it's not set
 if [ -z "$EZ_DIR" ]
 then
     EZ_DIR=`pwd`
 fi
 
+#TODO
+# attivimo temporaneamente ALL di default
 if [ -z "$ALL" ]
 then
-    ALL="0"
+    ALL="1"
 fi
 
 
@@ -231,7 +229,6 @@ fi
 cd $EZPCOMP_EZ_DIR
 
 
-PHP_EZSCAN=`which php_ezscan`
 
 #/home/developer/scripts/ezscan_dev/ezscan-php.php $EZINI_BLOCK_NAME $EZINI_VAR_NAME
 if  [ "$EZINI_BLOCK_NAME" ] && [ "$EZINI_VAR_NAME" ] ; then
@@ -244,15 +241,13 @@ if  [ "$EZINI_BLOCK_NAME" ] && [ "$EZINI_VAR_NAME" ] ; then
 fi
 
 
-# forse all for no options case
-ALL=1
 #
 if [ $ALL -eq 1 ] ; then
   if [ $VERBOSE -eq 1 ] ; then
     echo  "# Showing all: "
   fi
     echo 
-    echo "eZ Publish directory:  $EZ_DIR"
+    echo "eZ Publish directory:  $EZPCOMP_EZ_DIR"
     echo
     echo "#eZINI"
     echo "[FileSettings]"
@@ -268,5 +263,5 @@ if [ $ALL -eq 1 ] ; then
     echo "AvailableSiteAccessList="
     echo "`$PHP_EZSCAN _ini SiteAccessSettings AvailableSiteAccessList`" 
     echo
+    echo "try 'ezscan --help' for datailed options"
 fi
-
