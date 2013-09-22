@@ -1,0 +1,108 @@
+#!/bin/bash
+#
+# ezscan script
+# v. 0.0.2
+#
+# getting info from ezpublish installations
+#
+#
+#* Return values:
+# 0: OK
+# 1: error
+#
+###################################################################
+# 
+#
+# v.0.2
+# introdotto script bash
+#
+##################################################################
+#
+#
+VERBOSE=0
+#
+# while getopts :vdsH:P:m:r:Q:t:u:o: opt
+while getopts vhd: opt
+do
+  case "$opt" in
+    v) echo "Found the -v (verbose) option"
+       VERBOSE=1 ;;
+    h) if [ $VERBOSE -eq 1 ]
+       then
+         echo "Found the -h (help) option"
+       fi
+       echo "Usage: "
+       echo "ezscan [-v] [OPTION] -d documentroot"
+       echo "ezscan -h"
+       echo 
+       echo 
+       echo "Valid options are: "
+       echo
+       echo "   -v              verbose (better if it's the first option)"
+       echo "   -h              help (this page)"
+       echo "   -d              ez document root (default to current directory)"
+       echo " "
+       echo "Ex."
+       echo "./ezscan -d '/home/httpd/myez/html'"
+       echo 
+       exit;;
+    d) DOCUMENT_ROOT=$OPTARG
+       if [ $VERBOSE -eq 1 ]
+       then
+         echo "Found the -d (documentroot) option, with value: $OPTARG"
+       fi ;;
+    *) echo "Unknown option: $opt"
+       echo "Try 'ezscan -h' for more information."
+       exit 1 ;;
+  esac
+done
+
+# Test presence of mandatory options
+#if [ -z "$DOCUMENT_ROOT" ]
+#then
+#  echo "missing  -d (documentroot) option"
+#  EXIT_FOR_ERROR=yes
+#fi
+
+if [ $EXIT_FOR_ERROR ]
+then
+  echo "ERROR"
+  echo "Try 'ezscan -h'"
+  exit 1
+fi
+
+#
+#
+# set defaults
+
+if [ -z "$DOCUMENT_ROOT" ]
+then
+    DOCUMENT_ROOT=`pwd`
+fi
+
+
+
+if [ $VERBOSE -eq 1 ]
+then
+  echo "executing..."
+fi
+#
+# Ora dobbiamo eseguire una falsa chiamata ad ezp per:
+# 1. controllare di essere all'interno di un dir di eZ
+# 2. popolare le variabili d'ambiente: EZPCOMP_EZ_DIR, EZPCOMP_IS_EZ_DIR, EZPCOMP_PWD
+#
+# ezp * Return values:
+# * - 0: OK
+# * - 1: unknown command
+# * - 2: unknown script
+
+EZP_PATH=`which ezp`
+$EZP_PATH 
+if [ $? -eq 1 ]
+then
+  exit 1
+fi
+
+
+echo $EZPCOMP_EZ_DIR
+echo $EZPCOMP_IS_EZ_DIR
