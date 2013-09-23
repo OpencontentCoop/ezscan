@@ -329,7 +329,7 @@ if [ $ALL -eq 1 ] ; then
       echo 
       echo "	siteaccess: $siteaccess"
       echo "		[FileSettings]"
-      echo "		VarDir=`$PHP_EZSCAN _ini FileSettings VarDir`" 
+      echo "		VarDir=`$PHP_EZSCAN _ini_fetchFromFile FileSettings VarDir $siteaccess`" 
       echo
       echo "		[DatabaseSettings]"
       echo "		Server=`$PHP_EZSCAN _ini_fetchFromFile DatabaseSettings Server $siteaccess`" 
