@@ -30,7 +30,7 @@ PHP_EZSCAN=`which php_ezscan`
 #
 # getops see /usr/share/doc/util-linux/examples/getopt-parse.bash
 this_script=`basename $0`
-TEMP=`getopt -o vhB:V:aS:sz:: --long verbose,help,ini-block-name:,ini-var-name:,all,siteaccess:,siteaccess-list,z-long:: \
+TEMP=`getopt -o vhdB:V:aS:sz:: --long verbose,help,ezpublish-directory,ini-block-name:,ini-var-name:,all,siteaccess:,siteaccess-list,z-long:: \
      -n "$this_script" -- "$@"`
 
 if [ $? != 0 ] ; then 
@@ -52,26 +52,27 @@ while true ; do
 				fi
 				echo "usage: ezscan [-v|--verbose]"
 				echo "              [-B|--ini-block-name block-name] [-V|--ini-var-name var-name]"
-                echo "              [-a|--all]"
-                echo "              [-h|--help]"
-                echo "              [-s|--siteaccess-list]"
-                echo "              [-S|--siteaccess siteaccess]"
-				echo "              [DIRECTORY]"
+                		echo "              [-a|--all]"
+                		echo "              [-h|--help]"
+                                echo "              [-d|--ezpublish-directory]"
+                		echo "              [-s|--siteaccess-list]"
+                		echo "              [-S|--siteaccess siteaccess]"
+				echo "              [DIRECTORY] (default to current dir)"
 				echo "e.g."
 				echo "ezscan  /home/httpd/mysite.site.com/html"
-                echo "ezscan -a"
+                		echo "ezscan -a"
 				echo "ezscan -B DatabaseSettings -V User"
-                echo "ezscan -s"
-                echo "ezscan -a -S SiteAccess"
+                		echo "ezscan -s"
+                		echo "ezscan -a -S SiteAccess"
 				echo "ezscan -h"
 				echo 
 				exit;;
-    #    -d|--directory) 
-	#		EZ_DIR="$2" 
-    #        if [ $VERBOSE -eq 1 ]; then 
-    #          echo "Found the -d (documentroot) option, with value: $2"
-    #        fi 
-    #     	 shift 2 ;;
+        -d|--ezpublish-directory) 
+            EZPUBLISH_DIRECTORY=1
+            if [ $VERBOSE -eq 1 ]; then 
+              echo "Found the -d (--ezpublish-directory) option"
+            fi 
+            shift ;;
         -B|--ini-block-name)
             EZINI_BLOCK_NAME="$2"
             if [ $VERBOSE -eq 1 ]; then
@@ -240,6 +241,11 @@ if [ -z "$EZPCOMP_IS_EZ_DIR" ] || [ "$EZPCOMP_IS_EZ_DIR" -eq 0 ]; then
   exit 1
 fi
 
+if [ $EZPUBLISH_DIRECTORY -eq 1 ] ; then
+  [ $VERBOSE -eq 1 ] && echo "eZ Publish directory is: "
+  echo $EZPCOMP_EZ_DIR
+  exit
+fi
 
 if [ $VERBOSE -eq 1 ] ; then
   echo  "# Executing: "
