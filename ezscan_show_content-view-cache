@@ -1,0 +1,60 @@
+#!/bin/bash
+#
+DEBUG=1
+EZSCAN=`which ezscan`
+
+output=`$EZSCAN -s`
+RETVAL=$?
+if [ $RETVAL -ne 0 ] ; then
+  echo $output
+  exit 1
+fi
+siteaccess_list=$output
+
+# we move to main ezpublish dir
+cd `$EZSCAN -d`
+
+
+[ $DEBUG -eq 1 ] && echo && echo "###########   Ez content-view-cache ############" 
+
+VarDir=`$EZSCAN  -B FileSettings -V VarDir`
+
+
+[ $DEBUG -eq 1 ] && echo "VarDir=$VarDir"
+
+
+
+expiri=$VarDir/cache/expiry.php
+if [ -f "$expiri" ] ; then
+   echo "global expiry found:" `ls -la "$expiri"`
+   expiri_timestamp=`cat $expiri | grep content-view-cache | sed "s/'content-view-cache' => //" | sed 's/ //g' | sed 's/,//'`
+   echo "  with 'content-view-cache' timestamp=$expiri_timestamp : " `date -d @$expiri_timestamp` 
+   echo
+fi
+
+[ $DEBUG -eq 1 ] && echo "siteaccess_list=$siteaccess_list"
+for siteaccess in $siteaccess_list ; do
+    echo
+    VarDir=`$EZSCAN -S $siteaccess  -B FileSettings -V VarDir`
+    [ $DEBUG -eq 1 ] && echo "    siteaccess=$siteaccess"; echo "    VarDir=$VarDir"
+    CacheDir=`$EZSCAN -S $siteaccess  -B FileSettings -V CacheDir`
+    if [ "$CacheDir" ] ; then 
+      echo "    found CacheDir=$CacheDir defined in siteaccess/site.ini"
+    else
+      CacheDir=$VarDir/cache/content/$siteaccess/
+      echo "    CacheDir: (standard)"
+    fi
+    if [ -d "$CacheDir" ] ; then
+		echo "          " `du -sh "$CacheDir"`
+		expiri=$VarDir/cache/expiry.phpi
+        if [ -f "$expiri" ] ; then 
+           echo "    expiry:  " `ls -la "$expiri"`
+           expiri_timestamp=`cat $expiri | grep content-view-cache | sed "s/'content-view-cache' => //" | sed 's/ //g' | sed 's/,//'`
+           echo "       with 'content-view-cache' timestamp=$expiri_timestamp : " `date -d @$expiri_timestamp` 
+
+        fi
+    else
+        echo "     (not existing)"
+    fi
+done
+echo
