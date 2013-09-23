@@ -247,17 +247,41 @@ if [ $VERBOSE -eq 1 ] ; then
 fi
 cd $EZPCOMP_EZ_DIR
 
+###################################################################################
+##   We are now in a valid eZ directory
+###################################################################################
+
 #get siteaccess list
 siteaccess_list=`$PHP_EZSCAN _ini SiteAccessSettings AvailableSiteAccessList`
 
-if  [ "$SITEACCESS_LIST" ] ; then
-  if [ $VERBOSE -eq 1 ] ; then
-    echo  "# Executing: "
-    echo "$PHP_EZSCAN _ini SiteAccessSettings AvailableSiteAccessList" 
-  fi
-  echo $siteaccess_list
-  exit
+# check if SITEACCESS exists
+if [ $SITEACCESS ] ; then
+    SITEACCESS_EXISTS="0"
+    for siteaccess in $siteaccess_list ; do
+      if [ $siteaccess = $SITEACCESS ] ; then
+        SITEACCESS_EXISTS="1"
+      fi
+    done
+    if [ $SITEACCESS_EXISTS -eq 0 ] ; then
+      #echo "ERROR"
+      echo "Siteaccess: '$SITEACCESS' does not exists"
+      echo "Possible siteaccess are:"
+      echo $siteaccess_list
+      exit 1
+    fi
 fi
+
+# la seguente e' necessaria per ridurre siteaccess_list in caso di richiesta di singolo siteaccess
+if [ $SITEACCESS ] ; then
+  siteaccess_list=$SITEACCESS
+fi
+#
+
+
+#################
+##  We have now a valid $siteaccess_list (with ONE or many siteaccess)
+#################
+
 
 
 #/home/developer/scripts/ezscan_dev/ezscan-php.php $EZINI_BLOCK_NAME $EZINI_VAR_NAME
@@ -266,28 +290,26 @@ if  [ "$EZINI_BLOCK_NAME" ] && [ "$EZINI_VAR_NAME" ] ; then
     echo  "# Executing: "
     echo "$PHP_EZSCAN _ini $EZINI_BLOCK_NAME $EZINI_VAR_NAME" 
   fi
-  $PHP_EZSCAN  _ini $EZINI_BLOCK_NAME $EZINI_VAR_NAME
+  if [ -z $SITEACCESS ] ; then
+    $PHP_EZSCAN  _ini $EZINI_BLOCK_NAME $EZINI_VAR_NAME
+  else
+    for siteaccess in $siteaccess_list
+     do
+      [ $SITEACCESS_LIST ] && echo "Siteaccess: $siteaccess"
+      $PHP_EZSCAN _ini_fetchFromFile $EZINI_BLOCK_NAME $EZINI_VAR_NAME  $siteaccess
+    done
+  fi
   exit
 fi
 
-#get siteaccess list
-siteaccess_list=`$PHP_EZSCAN _ini SiteAccessSettings AvailableSiteAccessList`
 
-# check if SITEACCESS exists
-if [ $SITEACCESS ] ; then
-	SITEACCESS_EXISTS="0"
-	for siteaccess in $siteaccess_list ; do
-	  if [ $siteaccess = $SITEACCESS ] ; then
-	    SITEACCESS_EXISTS="1"
-	  fi
-	done
-	if [ $SITEACCESS_EXISTS -eq 0 ] ; then 
-	  #echo "ERROR"
-	  echo "Siteaccess: '$SITEACCESS' does not exists"
-	  echo "Possible siteaccess are:"
-	  echo $siteaccess_list
-	  exit 1
-	fi
+if  [ "$SITEACCESS_LIST" ] ; then
+  #if [ $VERBOSE -eq 1 ] ; then
+  #  echo  "# Executing: "
+  #  echo "$PHP_EZSCAN _ini SiteAccessSettings AvailableSiteAccessList" 
+  #fi
+  echo $siteaccess_list
+  exit
 fi
 
 
@@ -320,10 +342,6 @@ if [ $ALL -eq 1 ] ; then
 	    echo
     fi
     # elavora gli ini di ogni siteaccess
-    if [ $SITEACCESS ] ; then
-    siteaccess_list=$SITEACCESS
-    fi
-    #
     for siteaccess in $siteaccess_list 
      do
       echo 
