@@ -241,7 +241,7 @@ if [ -z "$EZPCOMP_IS_EZ_DIR" ] || [ "$EZPCOMP_IS_EZ_DIR" -eq 0 ]; then
   exit 1
 fi
 
-if [ $EZPUBLISH_DIRECTORY -eq 1 ] ; then
+if [ $EZPUBLISH_DIRECTORY ] ; then
   [ $VERBOSE -eq 1 ] && echo "eZ Publish directory is: "
   echo $EZPCOMP_EZ_DIR
   exit
