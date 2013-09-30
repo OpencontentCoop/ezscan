@@ -11,6 +11,34 @@ if [ $RETVAL -ne 0 ] ; then
 fi
 siteaccess_list=$output
 
+# conta numero totale dei file di una directory che siano + vecchi di timestamp
+# parametri: directory, timestamp
+function files_number {
+  local aux_filename="/tmp/_files_number.tmp"
+  local my_dir=$1
+  local my_timestamp=$2
+  local timestamp_in_words=`date -d @$my_timestamp`
+  touch -d "$timestamp_in_words" $aux_filename
+  if [ -d "$my_dir" ] ; then
+    find $my_dir -not -newer $aux_filename | wc -l
+  fi
+
+}
+# calcola dimensione totale dei file di una directory che siano + vecchi di timestamp
+# parametri: directory, timestamp
+function total_files_size {
+  local aux_filename="/tmp/_total_files_size.tmp"
+  local my_dir=$1
+  local my_timestamp=$2
+  local timestamp_in_words=`date -d @$my_timestamp`
+  touch -d "$timestamp_in_words" $aux_filename
+  if [ -d "$my_dir" ] ; then
+    find $my_dir -not -newer $aux_filename | xargs  stat --format=%s | awk '{s+=$1} END {print s}'
+    #return `find $my_dir -not -newer  $aux_filename | xargs stat --format=%s | paste -sd+ - | bc`
+  fi
+}
+
+
 # we move to main ezpublish dir
 cd `$EZSCAN -d`
 
@@ -46,12 +74,21 @@ for siteaccess in $siteaccess_list ; do
     fi
     if [ -d "$CacheDir" ] ; then
 		echo "          " `du -sh "$CacheDir"`
-		expiri=$VarDir/cache/expiry.phpi
+      echo "    TOTAL size:          " `du -sh "$CacheDir"`
+      expiri_timestamp_meno_1m=$(($expiri_timestamp-60))
+      num_total=`files_number $CacheDir $expiri_timestamp_meno_1m`
+      size_total=`total_files_size $CacheDir $expiri_timestamp_meno_1m`
+      echo 
+      echo "      Files older than expiry timestamp $expiri_timestamp (unnecessary files):"
+      echo "       Total number: $num_total"
+      site_total_in_megabytes=`echo "$size_total/(1024*1024)" | bc`
+      echo "       Total size (bytes): $size_total bytes ($site_total_in_megabytes MB)"
+
+      expiri=$VarDir/cache/expiry.phpi
         if [ -f "$expiri" ] ; then 
            echo "    expiry:  " `ls -la "$expiri"`
            expiri_timestamp=`cat $expiri | grep content-view-cache | sed "s/'content-view-cache' => //" | sed 's/ //g' | sed 's/,//'`
            echo "       with 'content-view-cache' timestamp=$expiri_timestamp : " `date -d @$expiri_timestamp` 
-
         fi
     else
         echo "     (not existing)"
