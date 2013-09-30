@@ -1,0 +1,59 @@
+#!/bin/bash
+#
+DEBUG=1
+EZSCAN=`which ezscan`
+
+output=`$EZSCAN -s`
+RETVAL=$?
+if [ $RETVAL -ne 0 ] ; then
+  echo $output
+  exit 1
+fi
+siteaccess_list=$output
+
+# we move to main ezpublish dir
+cd `$EZSCAN -d`
+
+
+[ $DEBUG -eq 1 ] && echo && echo "###########   Ez template-block-cache ############" 
+
+VarDir=`$EZSCAN  -B FileSettings -V VarDir`
+
+
+[ $DEBUG -eq 1 ] && echo "VarDir=$VarDir"
+
+
+
+expiri=$VarDir/cache/expiry.php
+if [ -f "$expiri" ] ; then
+   echo "global expiry found:" `ls -la "$expiri"`
+   expiri_timestamp=`cat $expiri | grep "'template-block-cache'" | sed "s/'template-block-cache' => //" | sed 's/ //g' | sed 's/,//'`
+   echo "  with 'template-block-cache' timestamp=$expiri_timestamp : " `date -d @$expiri_timestamp` 
+   echo
+fi
+
+CacheDir=$VarDir/cache/template-block
+if [ "$CacheDir" ] ; then 
+  echo "    found template-block dir: $CacheDir"
+else
+  echo "    could not find template-bloc"k
+fi
+if [ -d "$CacheDir" ] ; then
+  echo "    found template-block dir: $CacheDir"
+  echo "          " `du -sh "$CacheDir"`
+else
+  echo "    could not find template-block dir: $CacheDir"      
+fi
+
+echo
+
+if [ -d "$CacheDir" ] ; then
+  expiri_timestamp_in_words=`date -d @$expiri_timestamp`
+  touch -d $expiri_timestamp_in_words  /tmp/ezscan_cache_block_expiry_timestamp
+  num_total=`find $CacheDir -not -newer /tmp/ezscan_cache_block_expiry_timestamp | wc -l`
+  echo "Number of files in $CacheDir older than expiry timestamp (unnecessary files): $num_total"
+  size_total=`find $CacheDir -not -newer /tmp/ezscan_cache_block_expiry_timestamp | xargs stat --format=%s | awk '{s+=$1} END {print s}'`
+  #size_total=`find $CacheDir -not -newer /tmp/ezscan_cache_block_expiry_timestamp | xargs stat --format=%s | paste -sd+ - | bc`
+  site_total_in_megabytes=`echo "$size_total/(1024*1024)" | bc`
+  echo "Total size (bytes): $size_total bytes ($site_total_in_megabytes MB)"
+fi
