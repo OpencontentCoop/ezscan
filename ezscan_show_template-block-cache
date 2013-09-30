@@ -79,3 +79,29 @@ else
   echo "    could not find template-block dir: $CacheDir"
 fi
 echo
+
+if [ -f "$expiri" ] ; then
+   echo "global expiry found:" `ls -la "$expiri"`
+   expiri_timestamp=`cat $expiri | grep "'global-template-block-cache'" | sed "s/'global-template-block-cache' => //" | sed 's/ //g' | sed 's/,//'`
+   echo "  with 'global-template-block-cache' timestamp=$expiri_timestamp : " `date -d @$expiri_timestamp` 
+   echo
+fi
+
+CacheDir=$VarDir/cache/template-block
+expiri_timestamp_meno_1m=$(($expiri_timestamp-60))
+if [ -d "$CacheDir" ] ; then
+  echo "found template-block dir: $CacheDir"
+  echo 
+  echo " TOTAL size:          " `du -sh "$CacheDir"`
+  num_total=`files_number $CacheDir $expiri_timestamp_meno_1m`
+  size_total=`total_files_size $CacheDir $expiri_timestamp_meno_1m`
+  echo 
+  echo " Files older than expiry timestamp (unnecessary files):"
+  echo "     Total number: $num_total"
+  site_total_in_megabytes=`echo "$size_total/(1024*1024)" | bc`
+  echo "     Total size (bytes): $size_total bytes ($site_total_in_megabytes MB)"
+else
+  echo "    could not find template-block dir: $CacheDir"
+fi
+echo
+
