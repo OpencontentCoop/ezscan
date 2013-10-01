@@ -55,8 +55,13 @@ while true ; do
 				       then
 				         echo "Found the -h (help) option"
 				fi
-				echo "Usage: ezscan [OPTIONS]..."
+                echo
+				echo "Usage: ezscan [OPTIONS]... [DIRECTORY]"
                 echo "eZ Publish utility to extract basic settings info from command line"
+                echo
+                echo "Please note: "
+                echo "  * must be executed inside (even anyware) a eZ Publish directory"
+                echo "  * current dir is used if DIRECTORY is not specified"     
                 echo
                 echo "General options:"
                 echo "-h,--help                       display this help and exit"
@@ -69,16 +74,16 @@ while true ; do
                 echo "-V,--ini-var-name VAR-NAME      display content of VAR-NAME in site.ini settings,"
                 echo "                                  (to be used along with -B)"
                	echo "-a,--all]                       display all info"
+                echo "-D,--ezpublish-directory        display eZ Publish directory (documentroot)"
                 echo "-D,--ezpublish-directory DIR    selected directory for operations,"
-                echo "                                  (if not specified current directory is used)"
+                echo "                                  (display documentroot if DIR is not specified)"
 				echo "Examples:"
                 echo "ezscan"
                 echo "ezscan -S"
-                echo "ezscan -s eng"
 				echo "ezscan -D /home/httpd/mysite.site.com/html"
-				echo "ezscan -B DatabaseSettings -V User"
+				echo "ezscan -B DatabaseSettings -V Database"
                 echo "ezscan -s eng"
-                echo "ezscan -s eng -B DatabaseSettings -V User"
+                echo "ezscan -s eng -B DatabaseSettings -V Database"
 				echo 
 				exit;;
         -D|--ezpublish-directory) 
