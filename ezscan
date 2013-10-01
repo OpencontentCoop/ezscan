@@ -29,6 +29,7 @@
 ##################################################################
 #
 #
+PHP=`which php`
 PHP_EZSCAN=`which php_ezscan`
 EZSCAN=`which ezscan`
 NGINX_SITE_ENABLED_DIR=/etc/nginx/sites-enabled
@@ -89,7 +90,7 @@ while true ; do
 				echo "ezscan -vS -B DatabaseSettings -V Database"
                 echo "ezscan -as eng"
                 echo "ezscan -s eng -B DatabaseSettings -V Server"
-				echo "ezscan -w"
+		echo "ezscan -w"
                 echo 
 				exit;;
         -D|--ezpublish-directory) 
@@ -438,12 +439,12 @@ if  [ "$EZ_VERSION" ] ; then
   version_tmp='/tmp/tmp_ezscan_version.php'
   cp lib/version.php $version_tmp
   sed -i 's/\?>/echo eZPublishSDK::VERSION_MAJOR;echo ".";echo eZPublishSDK::VERSION_MINOR;echo ".";echo eZPublishSDK::VERSION_RELEASE; echo " (alias "; echo eZPublishSDK::VERSION_ALIAS;echo ")"; echo "\n";\?>/' $version_tmp
-  PHP=`which php`
-  if $PHP $version_tmp
+  output=`$PHP $version_tmp`
+  if [ $? ]
    then
-     if [ $DEBUG ] ; then
-       echo "found ez-version, exiting"
-     fi
+     [ $DEBUG ] && echo "found ez-version, exiting"
+     [ $VERBOSE ] && echo "eZPublish version: "
+     echo $output
      exit
    else
      echo "no ez-version found" 
