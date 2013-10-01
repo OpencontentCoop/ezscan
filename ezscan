@@ -32,6 +32,8 @@
 VERBOSE=0
 PHP_EZSCAN=`which php_ezscan`
 EZSCAN=`which ezscan`
+NGINX_SITE_ENABLED_DIR=/etc/nginx/sites-enabled
+APACHE_SITE_ENABLED_DIR=/etc/apache2/sites-enabled
 
 #
 #
@@ -358,12 +360,22 @@ if  [ "$WEB_VIRTUAL_HOST" ] ; then
     echo  "# Executing: "
     echo  "grep -l  \"^\s*root\s*$EZPCOMP_EZ_DIR\" /etc/*/sites-enabled/*"
   fi
-  
-  if grep -l  "^\s*root\s*$EZPCOMP_EZ_DIR" /etc/*/sites-enabled/*
+  if   [ -d $NGINX_SITE_ENABLED_DIR ]  ; then
+    virtualhost=`grep -l  "^\s*root\s*$EZPCOMP_EZ_DIR" $NGINX_SITE_ENABLED_DIR/*`
+    result=$?
+  elif [ -d $APACHE_SITE_ENABLED_DIR ] ; then
+    virtualhost=`grep -l  "^\s*DocumentRoot\s*$EZPCOMP_EZ_DIR" $APACHE_SITE_ENABLED_DIR/*`
+    result=$?
+  else
+    echo "no web server found, exiting"
+    exit 1
+  fi
+  if [ "$result" -eq 0 ]
    then
      if [ $VERBOSE -eq 1 ] ; then
        echo "found virtualhost, exiting"
      fi
+     echo $virtualhost
      exit
    else
      echo "no virtualhost found" 
@@ -379,11 +391,17 @@ if  [ "$WEB_VIRTUAL_HOST_NAME" ] ; then
   virtual_host=`$EZSCAN -w`
   if [ $? -eq 0 ] ; then
     if [ $VERBOSE -eq 1 ] ; then
-      echo "found virtualhost, exiting"
+      echo "found virtualhost, now scanning for server names"
     fi
-    grep "^\s*server_name"  $virtual_host  
-    grep "^\s*ServerName"  $virtual_host
-    grep "^\s*ServerAlias"  $virtual_host
+    if   [ -d $NGINX_SITE_ENABLED_DIR ]  ; then
+      grep "^\s*server_name"  $virtual_host  
+    elif [ -d $APACHE_SITE_ENABLED_DIR ] ; then
+      grep "^\s*ServerName"  $virtual_host
+      grep "^\s*ServerAlias"  $virtual_host
+    else
+      echo "no web server found, exiting"
+      exit 1
+    fi
     exit
   else
     echo "no virtualhost found"    
