@@ -14,6 +14,11 @@
 #
 ###################################################################
 # 
+#
+# v.0.4
+#
+# rivedo opzioni
+#
 # v.0.3
 # aggiunto getops -l (long format)
 # aggiunto + options
@@ -30,7 +35,7 @@ PHP_EZSCAN=`which php_ezscan`
 #
 # getops see /usr/share/doc/util-linux/examples/getopt-parse.bash
 this_script=`basename $0`
-TEMP=`getopt -o vhdB:V:aS:sz:: --long verbose,help,ezpublish-directory,ini-block-name:,ini-var-name:,all,siteaccess:,siteaccess-list,z-long:: \
+TEMP=`getopt -o vhdB:V:as:Sz:: --long verbose,help,ezpublish-directory,ini-block-name:,ini-var-name:,all,siteaccess:,list-siteaccess,z-long:: \
      -n "$this_script" -- "$@"`
 
 if [ $? != 0 ] ; then 
@@ -52,11 +57,11 @@ while true ; do
 				fi
 				echo "usage: ezscan [-v|--verbose]"
 				echo "              [-B|--ini-block-name block-name] [-V|--ini-var-name var-name]"
-                		echo "              [-a|--all]"
-                		echo "              [-h|--help]"
-                                echo "              [-d|--ezpublish-directory]"
-                		echo "              [-s|--siteaccess-list]"
-                		echo "              [-S|--siteaccess siteaccess]"
+               	echo "              [-a|--all]"
+               	echo "              [-h|--help]"
+                echo "              [-d|--ezpublish-directory]"
+                echo "              [-s|--siteaccess siteaccess]"
+               	echo "              [-S|--list-siteaccess]"
 				echo "              [DIRECTORY] (default to current dir)"
 				echo "e.g."
 				echo "ezscan  /home/httpd/mysite.site.com/html"
@@ -91,16 +96,16 @@ while true ; do
               echo "Found the -a (--all) option"
             fi
             shift ;;
-        -S|--siteaccess)
+        -s|--siteaccess)
             SITEACCESS="$2"
             if [ $VERBOSE -eq 1 ]; then
-              echo "Found the -S (--siteaccess) option, with value: $2"
+              echo "Found the -s (--siteaccess) option, with value: $2"
             fi
             shift 2 ;;
-        -s|--siteaccess-list)
+        -S|--siteaccess-list)
             SITEACCESS_LIST="1"
             if [ $VERBOSE -eq 1 ]; then
-              echo "Found the -s (--siteaccess-list) option"
+              echo "Found the -S (--list-siteaccess) option"
             fi
             shift ;;
 

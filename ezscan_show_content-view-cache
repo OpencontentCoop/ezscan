@@ -3,7 +3,7 @@
 DEBUG=1
 EZSCAN=`which ezscan`
 
-output=`$EZSCAN -s`
+output=`$EZSCAN --list-siteaccess`
 RETVAL=$?
 if [ $RETVAL -ne 0 ] ; then
   echo $output
