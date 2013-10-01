@@ -35,7 +35,7 @@ PHP_EZSCAN=`which php_ezscan`
 #
 # getops see /usr/share/doc/util-linux/examples/getopt-parse.bash
 this_script=`basename $0`
-TEMP=`getopt -o vhDB:V:as:Sz:: --long verbose,help,ezpublish-directory,ini-block-name:,ini-var-name:,all,siteaccess:,list-siteaccess,z-long:: \
+TEMP=`getopt -o vhDB:V:as:Swz:: --long verbose,help,ezpublish-directory,ini-block-name:,ini-var-name:,all,siteaccess:,list-siteaccess,web-virtual-host,z-long:: \
      -n "$this_script" -- "$@"`
 
 if [ $? != 0 ] ; then 
@@ -77,6 +77,8 @@ while true ; do
                 echo "-D,--ezpublish-directory        display eZ Publish directory (documentroot)"
                 echo "-D,--ezpublish-directory DIR    selected directory for operations,"
                 echo "                                  (display documentroot if DIR is not specified)"
+                echo "-w,--web-virtual-host           display virtualhost filename"
+                echo 
 				echo "Examples:"
                 echo "ezscan"
                 echo "ezscan -S"
@@ -84,7 +86,8 @@ while true ; do
 				echo "ezscan -B DatabaseSettings -V Database"
                 echo "ezscan -s eng"
                 echo "ezscan -s eng -B DatabaseSettings -V Database"
-				echo 
+				echo "ezscan -w"
+                echo 
 				exit;;
         -D|--ezpublish-directory) 
             EZPUBLISH_DIRECTORY=1
@@ -122,6 +125,12 @@ while true ; do
               echo "Found the -S (--list-siteaccess) option"
             fi
             shift ;;
+        -w|--web-virtual-host)
+            WEB_VIRTUAL_HOST="1"
+            if [ $VERBOSE -eq 1 ]; then
+              echo "Found the -w (--web-virtual-host) option"
+            fi
+            shift ;;
 
         -z|--z-long)
             # c has an optional argument. As we are in quoted mode,
@@ -131,6 +140,7 @@ while true ; do
                 "") echo "Option z, no argument"; shift 2 ;;
                 *)  echo "Option z, argument \`$2'" ; shift 2 ;;
             esac ;;
+
         --) shift ; break ;;
         *) echo "Internal error!" ; exit 1 ;;
     esac
@@ -329,11 +339,29 @@ fi
 
 
 if  [ "$SITEACCESS_LIST" ] ; then
-  #if [ $VERBOSE -eq 1 ] ; then
-  #  echo  "# Executing: "
-  #  echo "$PHP_EZSCAN _ini SiteAccessSettings AvailableSiteAccessList" 
-  #fi
+  if [ $VERBOSE -eq 1 ] ; then
+    echo  "# Executing: "
+    echo "$PHP_EZSCAN _ini SiteAccessSettings AvailableSiteAccessList" 
+  fi
   echo $siteaccess_list
+  exit
+fi
+
+if  [ "$WEB_VIRTUAL_HOST" ] ; then
+  if [ $VERBOSE -eq 1 ] ; then
+    echo  "# Searching virtualhost that contains: $EZPCOMP_EZ_DIR"
+    echo  "# Executing: "
+    echo  "grep -l  \"^\s*root\s*$EZPCOMP_EZ_DIR\" /etc/*/sites-enabled/*"
+  fi
+  
+  if grep -l  "^\s*root\s*$EZPCOMP_EZ_DIR" /etc/*/sites-enabled/*
+   then
+     if [ $VERBOSE -eq 1 ] ; then
+       echo "found virtualhost, exiting"
+     fi
+   else
+     echo "no virtualhost found" 
+  fi
   exit
 fi
 
