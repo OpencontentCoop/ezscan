@@ -377,7 +377,7 @@ if  [ "$WEB_VIRTUAL_HOST_NAME" ] ; then
     echo  "# Executing: "
   fi
   virtual_host=`$EZSCAN -w`
-  if [ "$?" ] ; then
+  if [ $? -eq 0 ] ; then
     if [ $VERBOSE -eq 1 ] ; then
       echo "found virtualhost, exiting"
     fi
