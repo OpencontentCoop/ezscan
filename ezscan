@@ -35,7 +35,7 @@ PHP_EZSCAN=`which php_ezscan`
 #
 # getops see /usr/share/doc/util-linux/examples/getopt-parse.bash
 this_script=`basename $0`
-TEMP=`getopt -o vhDB:V:as:Swz:: --long verbose,help,ezpublish-directory,ini-block-name:,ini-var-name:,all,siteaccess:,list-siteaccess,web-virtual-host,z-long:: \
+TEMP=`getopt -o vhDB:V:as:Swzx:: --long verbose,help,ezpublish-directory,ini-block-name:,ini-var-name:,all,siteaccess:,list-siteaccess,web-virtual-host,ez-version,x-long:: \
      -n "$this_script" -- "$@"`
 
 if [ $? != 0 ] ; then 
@@ -78,6 +78,7 @@ while true ; do
                 echo "-D,--ezpublish-directory DIR    selected directory for operations,"
                 echo "                                  (display documentroot if DIR is not specified)"
                 echo "-w,--web-virtual-host           display virtualhost filename"
+                echo "-z,--ez-version                 display eZ Publish version"
                 echo 
 				echo "Examples:"
                 echo "ezscan"
@@ -85,7 +86,7 @@ while true ; do
 				echo "ezscan -D /home/httpd/mysite.site.com/html"
 				echo "ezscan -B DatabaseSettings -V Database"
                 echo "ezscan -s eng"
-                echo "ezscan -s eng -B DatabaseSettings -V Database"
+                echo "ezscan -s eng -B DatabaseSettings -V Server"
 				echo "ezscan -w"
                 echo 
 				exit;;
@@ -131,9 +132,15 @@ while true ; do
               echo "Found the -w (--web-virtual-host) option"
             fi
             shift ;;
+        -z|--ez-version)
+            EZ_VERSION="1"
+            if [ $VERBOSE -eq 1 ]; then
+              echo "Found the -z (--ez-version) option"
+            fi
+            shift ;;
 
-        -z|--z-long)
-            # c has an optional argument. As we are in quoted mode,
+        -x|--x-long)
+            # x has an optional argument. As we are in quoted mode,
             # an empty parameter will be generated if its optional
             # argument is not found.
             case "$2" in
@@ -365,7 +372,26 @@ if  [ "$WEB_VIRTUAL_HOST" ] ; then
   exit
 fi
 
-
+if  [ "$EZ_VERSION" ] ; then
+  if [ $VERBOSE -eq 1 ] ; then
+    echo  "# Searching ez-version in  $EZPCOMP_EZ_DIR/lib/version.php"
+    echo  "# Executing: "
+    echo  "grep -l  \"^\s*root\s*$EZPCOMP_EZ_DIR\" /etc/*/sites-enabled/*"
+  fi
+  version_tmp='/tmp/tmp_ezscan_version.php'
+  cp lib/version.php $version_tmp
+  sed -i 's/\?>/echo eZPublishSDK::VERSION_MAJOR;echo ".";echo eZPublishSDK::VERSION_MINOR;echo ".";echo eZPublishSDK::VERSION_RELEASE; echo " (alias "; echo eZPublishSDK::VERSION_ALIAS;echo ")"; echo "\n";\?>/' $version_tmp
+  PHP=`which php`
+  if $PHP $version_tmp
+   then
+     if [ $VERBOSE -eq 1 ] ; then
+       echo "found ez-version, exiting"
+     fi
+   else
+     echo "no ez-version found" 
+  fi
+  exit
+fi
 #
 if [ $ALL -eq 1 ] ; then
   if [ $VERBOSE -eq 1 ] ; then
