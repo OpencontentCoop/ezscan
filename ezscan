@@ -31,6 +31,8 @@
 #
 VERBOSE=0
 PHP_EZSCAN=`which php_ezscan`
+EZSCAN=`which ezscan`
+
 #
 #
 # getops see /usr/share/doc/util-linux/examples/getopt-parse.bash
@@ -73,19 +75,16 @@ while true ; do
                 echo "                                  (to be used along with -V)"
                 echo "-V,--ini-var-name VAR-NAME      display content of VAR-NAME in site.ini settings,"
                 echo "                                  (to be used along with -B)"
-               	echo "-a,--all]                       display all info"
+               	echo "-a,--all                        display all info"
                 echo "-D,--ezpublish-directory        display eZ Publish directory (documentroot)"
-                echo "-D,--ezpublish-directory DIR    selected directory for operations,"
-                echo "                                  (display documentroot if DIR is not specified)"
                 echo "-w,--web-virtual-host           display virtualhost filename"
                 echo "-z,--ez-version                 display eZ Publish version"
                 echo 
 				echo "Examples:"
                 echo "ezscan"
-                echo "ezscan -S"
-				echo "ezscan -D /home/httpd/mysite.site.com/html"
+                echo "ezscan -aS"
 				echo "ezscan -B DatabaseSettings -V Database"
-                echo "ezscan -s eng"
+                echo "ezscan -as eng"
                 echo "ezscan -s eng -B DatabaseSettings -V Server"
 				echo "ezscan -w"
                 echo 
@@ -217,10 +216,10 @@ fi
 
 #TODO
 # attivimo temporaneamente ALL di default
-if [ -z "$ALL" ]
-then
-    ALL="1"
-fi
+#if [ -z "$ALL" ]
+#then
+#    ALL="1"
+#fi
 
 
 if [ $VERBOSE -eq 1 ]
@@ -345,14 +344,6 @@ if  [ "$EZINI_BLOCK_NAME" ] && [ "$EZINI_VAR_NAME" ] ; then
 fi
 
 
-if  [ "$SITEACCESS_LIST" ] ; then
-  if [ $VERBOSE -eq 1 ] ; then
-    echo  "# Executing: "
-    echo "$PHP_EZSCAN _ini SiteAccessSettings AvailableSiteAccessList" 
-  fi
-  echo $siteaccess_list
-  exit
-fi
 
 if  [ "$WEB_VIRTUAL_HOST" ] ; then
   if [ $VERBOSE -eq 1 ] ; then
@@ -393,12 +384,14 @@ if  [ "$EZ_VERSION" ] ; then
   exit
 fi
 #
-if [ $ALL -eq 1 ] ; then
+if [ "$ALL" ] ; then
   if [ $VERBOSE -eq 1 ] ; then
     echo  "# Showing all: "
   fi
     echo 
     echo "eZ Publish directory:  $EZPCOMP_EZ_DIR"
+    echo "eZ Publish version:    `$EZSCAN -z`"
+    echo "Virtualhost:           `$EZSCAN -w`"
     if [ -z $SITEACCESS ] ; then
 	    echo
 	    echo "#eZINI"
@@ -421,21 +414,41 @@ if [ $ALL -eq 1 ] ; then
 	    echo
     fi
     # elavora gli ini di ogni siteaccess
-    for siteaccess in $siteaccess_list 
-     do
-      echo 
-      echo "	siteaccess: $siteaccess"
-      echo "		[FileSettings]"
-      echo "		VarDir=`$PHP_EZSCAN _ini_fetchFromFile FileSettings VarDir $siteaccess`" 
-      echo
-      echo "		[DatabaseSettings]"
-      echo "		Server=`$PHP_EZSCAN _ini_fetchFromFile DatabaseSettings Server $siteaccess`" 
-      echo "		Database=`$PHP_EZSCAN _ini_fetchFromFile DatabaseSettings Database $siteaccess`" 
-      echo
-    done
-
-    echo
-    echo
+    if [ "$SITEACCESS_LIST" ] || [ "$SITEACCESS" ] ; then
+      for siteaccess in $siteaccess_list 
+       do
+        echo 
+        echo "	siteaccess: $siteaccess"
+        echo "		[FileSettings]"
+        echo "		VarDir=`$PHP_EZSCAN _ini_fetchFromFile FileSettings VarDir $siteaccess`" 
+        echo
+        echo "		[DatabaseSettings]"
+        echo "		Server=`$PHP_EZSCAN _ini_fetchFromFile DatabaseSettings Server $siteaccess`" 
+        echo "		Database=`$PHP_EZSCAN _ini_fetchFromFile DatabaseSettings Database $siteaccess`" 
+        echo
+      done
+    fi
     echo "try 'ezscan --help' for datailed options"
     echo
+    exit
+  fi
+
+
+if  [ "$SITEACCESS_LIST" ] ; then
+  if [ $VERBOSE -eq 1 ] ; then
+    echo  "# Executing: "
+    echo "$PHP_EZSCAN _ini SiteAccessSettings AvailableSiteAccessList" 
+  fi
+  echo $siteaccess_list
+  exit
 fi
+
+
+# if we arrive here it means nothing has been selected
+    echo "eZ Publish directory:  $EZPCOMP_EZ_DIR"
+    echo "eZ Publish version:    `$EZSCAN -z`"
+    echo "Virtualhost:           `$EZSCAN -w`"
+    echo "Siteaccess:            `$EZSCAN -S`"
+    echo
+    echo "more with 'ezscan -aS'  ('ezscan -h' for datailed options)"
+    echo
