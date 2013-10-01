@@ -37,7 +37,7 @@ EZSCAN=`which ezscan`
 #
 # getops see /usr/share/doc/util-linux/examples/getopt-parse.bash
 this_script=`basename $0`
-TEMP=`getopt -o vhDB:V:as:Swzx:: --long verbose,help,ezpublish-directory,ini-block-name:,ini-var-name:,all,siteaccess:,list-siteaccess,web-virtual-host,ez-version,x-long:: \
+TEMP=`getopt -o vhDB:V:as:Swznx:: --long verbose,help,ezpublish-directory,ini-block-name:,ini-var-name:,all,siteaccess:,list-siteaccess,web-virtual-host,ez-version,web-virtual-host-name,x-long:: \
      -n "$this_script" -- "$@"`
 
 if [ $? != 0 ] ; then 
@@ -78,6 +78,7 @@ while true ; do
                	echo "-a,--all                        display all info"
                 echo "-D,--ezpublish-directory        display eZ Publish directory (documentroot)"
                 echo "-w,--web-virtual-host           display virtualhost filename"
+                echo "-n,--web-virtual-host-name      display web ServerName as defined in virtualhost"
                 echo "-z,--ez-version                 display eZ Publish version"
                 echo 
 				echo "Examples:"
@@ -135,6 +136,12 @@ while true ; do
             EZ_VERSION="1"
             if [ $VERBOSE -eq 1 ]; then
               echo "Found the -z (--ez-version) option"
+            fi
+            shift ;;
+        -n|--web-virtual-host-name)
+            WEB_VIRTUAL_HOST_NAME="1"
+            if [ $VERBOSE -eq 1 ]; then
+              echo "Found the -n (--web-virtual-host-name) option"
             fi
             shift ;;
 
@@ -357,17 +364,39 @@ if  [ "$WEB_VIRTUAL_HOST" ] ; then
      if [ $VERBOSE -eq 1 ] ; then
        echo "found virtualhost, exiting"
      fi
+     exit
    else
      echo "no virtualhost found" 
+     exit 1
   fi
-  exit
 fi
+
+if  [ "$WEB_VIRTUAL_HOST_NAME" ] ; then
+  if [ $VERBOSE -eq 1 ] ; then
+    echo  "# Searching in virtualhost lines with 'server_name,ServerName,ServerAlias'"
+    echo  "# Executing: "
+  fi
+  virtual_host=`$EZSCAN -w`
+  if [ "$?" ] ; then
+    if [ $VERBOSE -eq 1 ] ; then
+      echo "found virtualhost, exiting"
+    fi
+    grep "^\s*server_name"  $virtual_host  
+    grep "^\s*ServerName"  $virtual_host
+    grep "^\s*ServerAlias"  $virtual_host
+    exit
+  else
+    echo "no virtualhost found"    
+    exit 1
+  fi
+fi
+
+
 
 if  [ "$EZ_VERSION" ] ; then
   if [ $VERBOSE -eq 1 ] ; then
     echo  "# Searching ez-version in  $EZPCOMP_EZ_DIR/lib/version.php"
     echo  "# Executing: "
-    echo  "grep -l  \"^\s*root\s*$EZPCOMP_EZ_DIR\" /etc/*/sites-enabled/*"
   fi
   version_tmp='/tmp/tmp_ezscan_version.php'
   cp lib/version.php $version_tmp
@@ -378,10 +407,11 @@ if  [ "$EZ_VERSION" ] ; then
      if [ $VERBOSE -eq 1 ] ; then
        echo "found ez-version, exiting"
      fi
+     exit
    else
      echo "no ez-version found" 
+     exit 1
   fi
-  exit
 fi
 #
 if [ "$ALL" ] ; then
