@@ -393,6 +393,7 @@ if  [ "$WEB_VIRTUAL_HOST_NAME" ] ; then
     if [ $VERBOSE -eq 1 ] ; then
       echo "found virtualhost, now scanning for server names"
     fi
+    echo "  List of Server name found in virtualhost ($virtual_host):" 
     if   [ -d $NGINX_SITE_ENABLED_DIR ]  ; then
       grep "^[[:space:]]*server_name"  $virtual_host  
     elif [ -d $APACHE_SITE_ENABLED_DIR ] ; then
@@ -440,6 +441,8 @@ if [ "$ALL" ] ; then
     echo "eZ Publish directory:  $EZPCOMP_EZ_DIR"
     echo "eZ Publish version:    `$EZSCAN -z`"
     echo "Virtualhost:           `$EZSCAN -w`"
+    echo "Siteaccess:            `$EZSCAN -S`"
+
     if [ -z $SITEACCESS ] ; then
 	    echo
 	    echo "#eZINI"
