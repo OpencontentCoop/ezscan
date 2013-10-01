@@ -358,13 +358,13 @@ if  [ "$WEB_VIRTUAL_HOST" ] ; then
   if [ $VERBOSE -eq 1 ] ; then
     echo  "# Searching virtualhost that contains: $EZPCOMP_EZ_DIR"
     echo  "# Executing: "
-    echo  "grep -l  \"^\s*root\s*$EZPCOMP_EZ_DIR\" /etc/*/sites-enabled/*"
+    echo  "grep ..."
   fi
   if   [ -d $NGINX_SITE_ENABLED_DIR ]  ; then
-    virtualhost=`grep -l  "^\s*root\s*$EZPCOMP_EZ_DIR" $NGINX_SITE_ENABLED_DIR/*`
+    virtualhost=`grep -l  "^[[:space:]]*root[[:space:]]*$EZPCOMP_EZ_DIR" $NGINX_SITE_ENABLED_DIR/*`
     result=$?
   elif [ -d $APACHE_SITE_ENABLED_DIR ] ; then
-    virtualhost=`grep -l  "^\s*DocumentRoot\s*$EZPCOMP_EZ_DIR" $APACHE_SITE_ENABLED_DIR/*`
+    virtualhost=`grep -l  "^[[:space:]]*DocumentRoot[[:space:]]*$EZPCOMP_EZ_DIR" $APACHE_SITE_ENABLED_DIR/*`
     result=$?
   else
     echo "no web server found, exiting"
@@ -394,10 +394,10 @@ if  [ "$WEB_VIRTUAL_HOST_NAME" ] ; then
       echo "found virtualhost, now scanning for server names"
     fi
     if   [ -d $NGINX_SITE_ENABLED_DIR ]  ; then
-      grep "^\s*server_name"  $virtual_host  
+      grep "^[[:space:]]*server_name"  $virtual_host  
     elif [ -d $APACHE_SITE_ENABLED_DIR ] ; then
-      grep "^\s*ServerName"  $virtual_host
-      grep "^\s*ServerAlias"  $virtual_host
+      grep "^[[:space:]]*ServerName"  $virtual_host
+      grep "^[[:space:]]*ServerAlias"  $virtual_host
     else
       echo "no web server found, exiting"
       exit 1
