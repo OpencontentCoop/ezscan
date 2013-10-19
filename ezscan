@@ -123,7 +123,7 @@ while true ; do
               echo "Found the -s (--siteaccess) option, with value: $2"
             fi
             shift 2 ;;
-        -S|--siteaccess-list)
+        -S|--list-siteaccess)
             SITEACCESS_LIST=1
             if [ $DEBUG ]; then
               echo "Found the -S (--list-siteaccess) option"
