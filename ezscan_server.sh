@@ -12,7 +12,7 @@ THIS_SCRIPT=`basename $0`
 
 ez_dirs=`echo /home/httpd/*/html | xargs $EZSCAN -qD`
 
-ez_dirs="/home/httpd/demo.opencontent.it/html"
+#ez_dirs="/home/httpd/demo.opencontent.it/html"
 
 echo "<?xml version=\"1.0\"?>"
 echo " <server>"
