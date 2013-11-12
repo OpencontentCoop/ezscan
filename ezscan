@@ -198,6 +198,11 @@ if [ $count -eq 1 ] ; then
     echo "One argument found: set EZ_DIR to current dir: $argomento"
   fi
   EZ_DIR=$argomento
+  # test if directory exists
+  if ! [ -d $EZ_DIR ] ; then
+    echo "cannot access '$EZ_DIR': No such directory"
+    EXIT_FOR_ERROR=yes
+  fi
 fi
 
 if [ $count -ge 2 ] ; then
@@ -516,7 +521,7 @@ fi
 
 
 # if we arrive here it means nothing has been selected
-    echo "---"
+    echo 
     echo "eZ Publish directory:  $EZPCOMP_EZ_DIR"
     echo "eZ Publish version:    `$EZSCAN -z`"
     echo "Virtualhost:           `$EZSCAN -w`"

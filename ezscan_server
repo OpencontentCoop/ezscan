@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# scan the hole server for ezpublish installation and report summary
+
+HTTPD_ROOT=/home/httpd
+
+EZSCAN=`which ezscan`
+THIS_SCRIPT=`basename $0`
+
+for dir in $HTTPD_ROOT/*/html ; do
+  output=`$EZSCAN -D $dir`
+  if [ $? -eq 1 ] ; then
+    echo $output
+    exit 1
+  fi
+done
