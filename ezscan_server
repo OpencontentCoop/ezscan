@@ -4,13 +4,20 @@
 
 HTTPD_ROOT=/home/httpd
 
+
+DEBUG=1
+
 EZSCAN=`which ezscan`
 THIS_SCRIPT=`basename $0`
 
+ez_document_roots=""
+
 for dir in $HTTPD_ROOT/*/html ; do
   output=`$EZSCAN -D $dir`
-  if [ $? -eq 1 ] ; then
-    echo $output
-    exit 1
+  if [ $? -eq 0 ] ; then
+    [ $DEBUG ] && echo "Found ez dir: $output"
+    ez_document_roots="$ez_document_roots $output"
   fi
 done
+
+[ $DEBUG ] && echo "Ezdirs: $ez_document_roots"

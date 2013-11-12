@@ -39,7 +39,7 @@ APACHE_SITE_ENABLED_DIR=/etc/apache2/sites-enabled
 #
 # getops see /usr/share/doc/util-linux/examples/getopt-parse.bash
 this_script=`basename $0`
-TEMP=`getopt -o dhDB:V:as:Swznvx:: --long debug,help,ezpublish-directory,ini-block-name:,ini-var-name:,all,siteaccess:,list-siteaccess,web-virtual-host,ez-version,web-virtual-host-name,verbose,x-long:: \
+TEMP=`getopt -o dhDB:V:as:Swzqnvx:: --long debug,help,ezpublish-directory,ini-block-name:,ini-var-name:,all,siteaccess:,list-siteaccess,web-virtual-host,ez-version,quiet,web-virtual-host-name,verbose,x-long:: \
      -n "$this_script" -- "$@"`
 
 if [ $? != 0 ] ; then 
@@ -82,6 +82,7 @@ while true ; do
                 echo "-w,--web-virtual-host           display virtualhost filename"
                 echo "-n,--web-virtual-host-name      display web ServerName as defined in virtualhost"
                 echo "-z,--ez-version                 display eZ Publish version"
+                echo "-q,--quit                       quite mode (for skipping error message: only set exit status = 1)"
                 echo "-d,--debug                      enable script debug"
                 echo 
 				echo "Examples:"
@@ -139,6 +140,12 @@ while true ; do
             EZ_VERSION=1
             if [ $DEBUG ]; then
               echo "Found the -z (--ez-version) option"
+            fi
+            shift ;;
+        -q|--quiet)
+            QUIET=1
+            if [ $DEBUG ]; then
+              echo "Found the -q (--quiet) option"
             fi
             shift ;;
         -n|--web-virtual-host-name)
@@ -200,7 +207,7 @@ if [ $count -eq 1 ] ; then
   EZ_DIR=$argomento
   # test if directory exists
   if ! [ -d $EZ_DIR ] ; then
-    echo "cannot access '$EZ_DIR': No such directory"
+    ! [ $QUIET ] && echo "cannot access '$EZ_DIR': No such directory"
     EXIT_FOR_ERROR=yes
   fi
 fi
@@ -223,7 +230,7 @@ fi
 if [ $EXIT_FOR_ERROR ]
 then
   #echo "ERROR"
-  echo "Try 'ezscan -h'"
+  ! [ $QUIET ] && echo "Try 'ezscan -h'"
   exit 1
 fi
 
@@ -295,7 +302,7 @@ fi
 
 # Not an eZ Dir
 if [ -z "$EZPCOMP_IS_EZ_DIR" ] || [ "$EZPCOMP_IS_EZ_DIR" -eq 0 ]; then
-  echo "You are not in a eZ Publish directory, or the documentroot you supplied is not an eZ Publish directory"
+  ! [ $QUIET ] && echo "You are not in a eZ Publish directory, or the documentroot you supplied is not an eZ Publish directory"
   exit 1
 fi
 
