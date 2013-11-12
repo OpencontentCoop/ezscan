@@ -36,6 +36,7 @@ NGINX_SITE_ENABLED_DIR=/etc/nginx/sites-enabled
 APACHE_SITE_ENABLED_DIR=/etc/apache2/sites-enabled
 
 #
+all_parameters="$*"
 #
 # getops see /usr/share/doc/util-linux/examples/getopt-parse.bash
 this_script=`basename $0`
@@ -60,20 +61,17 @@ while true ; do
 				         echo "Found the -h (help) option"
 				fi
                 echo
-				echo "Usage: ezscan [OPTIONS]... [DIRECTORY]"
+				echo "Usage: ezscan [OPTIONS]... [DIRECTORY] [DIRECTORY] ..."
                 echo "eZ Publish utility to extract basic settings info from command line"
                 echo
-                echo "Please note: "
-                echo "  * must be executed inside (even anyware) a eZ Publish directory"
-                echo "  * current dir is used if DIRECTORY is not specified"     
+                echo "If DIRECTORY is not specified, current directory is used"     
                 echo
                 echo "General options:"
                 echo "-h,--help                       display this help and exit"
                 echo "-s,--siteaccess SITEACCESS      selected siteaccess for operations"
                 echo "-S,--list-siteaccess            list all available siteaccess"
                 echo "-v,--verbose...                 display more information"
-#                echo "-d,--debug...                  display debug output at end of execution"
-				echo "-B,--ini-block-name BLOCK-NAME  selected BLOCK-NAME in site.ini settings,"
+		echo "-B,--ini-block-name BLOCK-NAME  selected BLOCK-NAME in site.ini settings,"
                 echo "                                  (to be used along with -V)"
                 echo "-V,--ini-var-name VAR-NAME      display content of VAR-NAME in site.ini settings,"
                 echo "                                  (to be used along with -B)"
@@ -82,18 +80,19 @@ while true ; do
                 echo "-w,--web-virtual-host           display virtualhost filename"
                 echo "-n,--web-virtual-host-name      display web ServerName as defined in virtualhost"
                 echo "-z,--ez-version                 display eZ Publish version"
-                echo "-q,--quit                       quite mode (for skipping error message: only set exit status = 1)"
+                echo "-q,--quit                       quite mode (skip error message in case DIRECTORY is not eZ Publish directory)"
                 echo "-d,--debug                      enable script debug"
                 echo 
-				echo "Examples:"
+		echo "Examples:"
                 echo "ezscan"
                 echo "ezscan -aS"
-				echo "ezscan -vS -B DatabaseSettings -V Database"
+		echo "ezscan -vS -B DatabaseSettings -V Database"
                 echo "ezscan -as eng"
                 echo "ezscan -s eng -B DatabaseSettings -V Server"
 		echo "ezscan -w"
-                echo 
-				exit;;
+                echo "echo /home/httpd/*/html | xargs ezscan -vqz" 
+                echo
+		exit;;
         -D|--ezpublish-directory) 
             EZPUBLISH_DIRECTORY=1
             if [ $DEBUG ]; then 
@@ -187,8 +186,9 @@ fi
 
 # counting arguments
 count=0
+arguments=""
 for arg do
-  argomento="$arg"
+  arguments="$arguments $arg"
   count=$[ $count + 1 ]    
 done
 
@@ -202,9 +202,9 @@ fi
 
 if [ $count -eq 1 ] ; then
   if [ $DEBUG ] ; then
-    echo "One argument found: set EZ_DIR to current dir: $argomento"
+    echo "One argument found: set EZ_DIR to current dir: $arguments"
   fi
-  EZ_DIR=$argomento
+  EZ_DIR=$arguments
   # test if directory exists
   if ! [ -d $EZ_DIR ] ; then
     ! [ $QUIET ] && echo "cannot access '$EZ_DIR': No such directory"
@@ -213,8 +213,24 @@ if [ $count -eq 1 ] ; then
 fi
 
 if [ $count -ge 2 ] ; then
-  echo "Too many arguments: only zero or 1 argument can be entered"
-  EXIT_FOR_ERROR=yes
+  # es. 
+  # ezscan -vD dir1 dird
+  #   all_options="-vD"
+  #   all_parameters="-vD dir1 dird"
+  #   arguments="dir1 dird"
+  #
+  # extract only options by removing remaining arguments at the end of $all_parameters
+  all_options=${all_parameters%"$arguments"}
+  if [ $DEBUG ] ; then
+    echo "all_options is $all_options*"
+    echo "all_parameters is $all_parameters*"
+    echo "arguments is $arguments*"
+  fi
+  for argument in $arguments; do
+    [ $DEBUG ] && echo "Now executing: $EZSCAN $all_options $argument"
+    $EZSCAN $all_options $argument
+  done
+  exit
 fi
 
 
