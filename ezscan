@@ -261,7 +261,7 @@ fi
 EZPCOMP_EZ_DIR=''
 cd $EZ_DIR
 
-# chech if we are inside an eZ Publish directory
+# check if we are inside an eZ Publish directory
 #    populate $EZPCOMP_IS_EZ_DIR, $EZPCOMP_EZ_DIR
 #
     if [ -n "$EZPCOMP_IS_EZ_DIR" ]; then EZPCOMP_IS_EZ_DIR=0; fi
@@ -307,7 +307,7 @@ if [ -z "$EZPCOMP_IS_EZ_DIR" ] || [ "$EZPCOMP_IS_EZ_DIR" -eq 0 ]; then
 fi
 
 if [ $EZPUBLISH_DIRECTORY ] ; then
-  [ $VERBOSE ] && echo "eZ Publish directory is: "
+  [ $VERBOSE ] && echo -n "eZ Publish directory is: "
   echo $EZPCOMP_EZ_DIR
   exit
 fi
@@ -364,8 +364,9 @@ if  [ "$EZINI_BLOCK_NAME" ] && [ "$EZINI_VAR_NAME" ] ; then
   if [ -z $SITEACCESS ] && [ -z $SITEACCESS_LIST ] ; then
     output=`$PHP_EZSCAN  _ini $EZINI_BLOCK_NAME $EZINI_VAR_NAME`
     if [ $VERBOSE ] ; then 
-      echo "[$EZINI_BLOCK_NAME]"
-      echo "$EZINI_VAR_NAME=$output"
+      echo "Settings for $EZPCOMP_EZ_DIR"
+      echo " [$EZINI_BLOCK_NAME]"
+      echo " $EZINI_VAR_NAME=$output"
     else
       echo $output
     fi
@@ -374,6 +375,7 @@ if  [ "$EZINI_BLOCK_NAME" ] && [ "$EZINI_VAR_NAME" ] ; then
       output=`$PHP_EZSCAN _ini_fetchFromFile $EZINI_BLOCK_NAME $EZINI_VAR_NAME  $siteaccess` 
       if [ $VERBOSE ] ; then 
         echo
+        echo "For $EZPCOMP_EZ_DIR"
         echo "Siteaccess: $siteaccess" 
         echo "  [$EZINI_BLOCK_NAME]"
         echo "  $EZINI_VAR_NAME=$output"
@@ -405,7 +407,7 @@ if  [ "$WEB_VIRTUAL_HOST" ] ; then
   fi
   if [ "$result" -eq 0 ]
    then
-     [ $VERBOSE ] && echo "Virtualhost: "
+     [ $VERBOSE ] && echo -n "Virtualhost for $EZPCOMP_EZ_DIR: "
      echo $virtualhost
      exit
    else
@@ -455,7 +457,7 @@ if  [ "$EZ_VERSION" ] ; then
   if [ $? ]
    then
      [ $DEBUG ] && echo "found ez-version, exiting"
-     [ $VERBOSE ] && echo "eZPublish version: "
+     [ $VERBOSE ] && echo -n "eZPublish in $EZPCOMP_EZ_DIR is version: "
      echo $output
      exit
    else
@@ -521,7 +523,7 @@ if  [ "$SITEACCESS_LIST" ] ; then
     echo  "# Executing: "
     echo "$PHP_EZSCAN _ini SiteAccessSettings AvailableSiteAccessList" 
   fi
-  [ $VERBOSE ] && echo "Siteaccess list:"
+  [ $VERBOSE ] && echo -n "Siteaccess list for $EZPCOMP_EZ_DIR: "
   echo $siteaccess_list
   exit
 fi
