@@ -351,9 +351,11 @@ if [ $SITEACCESS ] ; then
     done
     if [ $SITEACCESS_EXISTS -eq 0 ] ; then
       #echo "ERROR"
-      echo "Siteaccess: '$SITEACCESS' does not exists"
-      echo "Possible siteaccess are:"
-      echo $siteaccess_list
+      if ! [ $QUIET ] ; then 
+        echo "Siteaccess: '$SITEACCESS' does not exists"
+        echo "Possible siteaccess are:"
+        echo $siteaccess_list
+      fi
       exit 1
     fi
 fi
