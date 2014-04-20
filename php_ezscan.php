@@ -60,13 +60,14 @@ if ( count( $arguments ) === 0 )
 switch( $arguments[0] )
 {
 
-    case '_siteaccess_list':
-        # attenzione, il seguente non va bene!
-        # i siteaccess si ricavano dai file in settings/siteaccess. STOP
-        $siteaccessList = eZINI::instance()->variable( 'SiteAccessSettings', 'AvailableSiteAccessList' );
-        complete( $siteaccessList );
-        echo "\n";
-        break;
+    # il seguente commentato in quanto concettualmente errato!!
+    #case '_siteaccess_list':
+    #    # attenzione, il seguente non va bene!
+    #    # i siteaccess si ricavano dai file in settings/siteaccess. STOP
+    #    $siteaccessList = eZINI::instance()->variable( 'SiteAccessSettings', 'AvailableSiteAccessList' );
+    #    complete( $siteaccessList );
+    #    echo "\n";
+    #    break;
     case '_var_dir':
 	    $var_Dir = eZINI::instance()->variable( 'FileSettings', 'VarDir' );
 		echo $var_Dir;
