@@ -61,6 +61,8 @@ switch( $arguments[0] )
 {
 
     case '_siteaccess_list':
+        # attenzione, il seguente non va bene!
+        # i siteaccess si ricavano dai file in settings/siteaccess. STOP
         $siteaccessList = eZINI::instance()->variable( 'SiteAccessSettings', 'AvailableSiteAccessList' );
         complete( $siteaccessList );
         echo "\n";

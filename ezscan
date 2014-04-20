@@ -515,7 +515,7 @@ if [ "$ALL" ] ; then
 	    echo $siteaccess_list
 	    echo
     fi
-    # elavora gli ini di ogni siteaccess
+    # elabora gli ini di ogni siteaccess
     if [ "$SITEACCESS_LIST" ] || [ "$SITEACCESS" ] ; then
       for siteaccess in $siteaccess_list 
        do
