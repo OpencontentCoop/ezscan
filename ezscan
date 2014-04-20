@@ -339,7 +339,15 @@ cd $EZPCOMP_EZ_DIR
 ###################################################################################
 
 #get siteaccess list
-siteaccess_list=`$PHP_EZSCAN _ini SiteAccessSettings AvailableSiteAccessList`
+#siteaccess_list=`$PHP_EZSCAN _ini SiteAccessSettings AvailableSiteAccessList`
+comando='ls -1 settings/siteaccess'
+siteaccess_list=`$comando`
+esito=$?
+if [ "$esito" == "1" ] ; then
+  echo "ERRORE: non stato possibile creare il comando: $comando" 1>&2
+  echo "        Ouput comando di dump: $siteaccess_list" 1>&2 
+  exit 1
+fi
 
 # check if SITEACCESS exists
 if [ $SITEACCESS ] ; then
