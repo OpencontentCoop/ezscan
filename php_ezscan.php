@@ -43,10 +43,9 @@ if ( count( $arguments ) === 0 )
        echo "ezscan _ini SECTION VALUE\n";
        echo "\n";
        echo "e.g.  ezscan _ini DatabaseSettings User\n";
-       echo "      ezscan _ini SiteAccessSettings AvailableSiteAccessList\n";
        echo "\n";
        echo "shortcuts:\n";
-       echo "      ezscan _siteaccess_list\n";
+       #echo "      ezscan _siteaccess_list\n";
        echo "      ezscan _var_dir\n";
        echo "      ezscan _database\n";
        echo "      ezscan _database_server\n";
