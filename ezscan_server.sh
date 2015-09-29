@@ -2,8 +2,6 @@
 
 # scan the hole server for ezpublish installation and report summary
 
-HTTPD_ROOT=/home/httpd
-
 DEBUG=1
 
 EZSCAN=`which ezscan`
@@ -21,7 +19,9 @@ echo " <date>`date`</date>"
 echo " <ez_dirs>"
 
 
-for dir_modello in '/home/httpd/*/html' '/home/httpd/*/html/ezpublish_legacy' ; do
+#for dir_modello in '/home/httpd/*/html' '/home/httpd/*/html/ezpublish_legacy' ; do
+# aggiunto dir stramba (/home/httpd/*/ezpublish_legacy) per SAIT 
+for dir_modello in '/home/httpd/*/html' '/home/httpd/*/html/ezpublish_legacy'  '/home/httpd/*/ezpublish_legacy'; do
   #ez_dirs=`echo /home/httpd/*/html | xargs $EZSCAN -qD`
   ez_dirs=`echo $dir_modello | xargs $EZSCAN -qD`
 
