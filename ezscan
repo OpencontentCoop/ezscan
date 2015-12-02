@@ -30,8 +30,25 @@
 #
 #
 PHP=`which php`
+if [ $? != 0 ] ; then
+  echo "php is missing"
+  echo "Terminating..." >&2
+  exit 1
+fi
 PHP_EZSCAN=`which php_ezscan`
+if [ $? != 0 ] ; then
+  echo "php_ezscan is missing"
+  echo "Terminating..." >&2
+  exit 1
+fi
 EZSCAN=`which ezscan`
+if [ $? != 0 ] ; then
+  echo "ezscan is missing in PATH"
+  echo "Terminating..." >&2
+  exit 1
+fi
+
+
 NGINX_SITE_ENABLED_DIR=/etc/nginx/sites-enabled
 APACHE_SITE_ENABLED_DIR=/etc/apache2/sites-enabled
 
@@ -241,14 +258,6 @@ then
   echo "eZIni output needs both blockName & varName"
   EXIT_FOR_ERROR=yes
 fi
-
-# check presence of ezscan and PHP_EZSCAN in path
-if ( [ -z "EZSCAN" ] ||  [ -z "PHP_EZSCAN" ] )
-then
-  echo "could not find ezscan or php_ezscan in path"
-  EXIT_FOR_ERROR=yes
-fi
-
 
 
 if [ $EXIT_FOR_ERROR ]
