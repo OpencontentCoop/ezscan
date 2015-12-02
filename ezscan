@@ -242,6 +242,14 @@ then
   EXIT_FOR_ERROR=yes
 fi
 
+# check presence of ezscan and PHP_EZSCAN in path
+if ( [ -z "EZSCAN" ] ||  [ -z "PHP_EZSCAN" ] )
+then
+  echo "could not find ezscan or php_ezscan in path"
+  EXIT_FOR_ERROR=yes
+fi
+
+
 
 if [ $EXIT_FOR_ERROR ]
 then
