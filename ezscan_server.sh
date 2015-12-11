@@ -4,8 +4,11 @@
 
 DEBUG=1
 
-EZSCAN=`which ezscan`
-HOSTNAME_COMMAND=`which hostname`
+#EZSCAN=`which ezscan`
+# per far funzionare in cron
+EZSCAN=/usr/local/bin/ezscan
+#HOSTNAME_COMMAND=`which hostname`
+HOSTNAME_COMMAND=/bin/hostname
 THIS_SCRIPT=`basename $0`
 
 #ez_dirs=`echo /home/httpd/*/html | xargs $EZSCAN -qD`
