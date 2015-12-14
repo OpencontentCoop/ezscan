@@ -35,6 +35,9 @@ if [ $? != 0 ] ; then
   echo "Terminating..." >&2
   exit 1
 fi
+# needed for cron execution
+PATH=$PATH:/usr/local/bin/
+
 PHP_EZSCAN=`which php_ezscan`
 if [ $? != 0 ] ; then
   echo "php_ezscan is missing"
