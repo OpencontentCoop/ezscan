@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# segnala la presenza di installazioni ez senza requisiti
+PATH=$PATH:/usr/local/bin
+
+ROOT_DIR=/home/httpd
+EZSCAN=`which ezscan`
+#EZSCAN=/usr/local/bin/ezscan
+
+errore=0
+dirs1=`echo $ROOT_DIR/*/html | xargs $EZSCAN -qD`
+dirs2=`echo $ROOT_DIR/*/html/ezpublish_legacy | xargs $EZSCAN -qD`
+dirs3=`echo $ROOT_DIR/*/ezpublish_legacy | xargs $EZSCAN -qD`
+dirs="$dirs1 $dirs2 $dirs3"
+
+for dir in $dirs ; do
+    # controlo presenza file robots.txt
+    if ! [ -f $dir/robots.txt ] ; then
+      echo "Warning: robots.txt is missing in ez documentroot: $dir"
+      errore=1
+    fi
+    # controllo presenza file config.php
+    if ! [ -f $dir/config.php ] ; then
+      echo "Warning: config.php is missing in ez documentroot: $dir"
+      errore=1
+    else
+      # controllo presenza di MAGICK_THREAD_LIMIT=1, 
+      # vedi https://support.opencontent.it/opencontent/ticket/579
+      string_to_check='putenv( "MAGICK_THREAD_LIMIT=1" );'
+      grep -L ^"$string_to_check" $dir/config.php
+      if [ $? -eq 1 ] ; then
+        echo "Warning: $string_to_check is missing in ez  $dir/config.php"
+        errore=1
+      fi
+      # controllo presenza define( 'EZP_INI_FILEMTIME_CHECK', false );
+      string_to_check="define( 'EZP_INI_FILEMTIME_CHECK', false );"
+      grep -L ^"$string_to_check" $dir/config.php
+      if [ $? -eq 1 ] ; then
+        echo "Warning: $string_to_check is missing in ez  $dir/config.php"
+        errore=1
+      fi
+
+    fi
+
+done
+
+exit $errore
